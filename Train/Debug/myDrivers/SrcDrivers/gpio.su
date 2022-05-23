@@ -1,0 +1,11 @@
+../myDrivers/SrcDrivers/gpio.c:10:6:GPIO_ClockControl	16	static
+../myDrivers/SrcDrivers/gpio.c:54:6:GPIO_PinInit	32	static
+../myDrivers/SrcDrivers/gpio.c:135:6:GPIO_ResetPort	16	static
+../myDrivers/SrcDrivers/gpio.c:157:9:GPIO_ReadPin	16	static
+../myDrivers/SrcDrivers/gpio.c:161:10:GPIO_ReadPort	16	static
+../myDrivers/SrcDrivers/gpio.c:166:6:GPIO_WritePin	16	static
+../myDrivers/SrcDrivers/gpio.c:177:6:GPIO_WritePort	16	static
+../myDrivers/SrcDrivers/gpio.c:180:6:GPIO_TogglePin	16	static
+../myDrivers/SrcDrivers/gpio.c:186:6:GPIO_IRQ_EnableDisable	16	static
+../myDrivers/SrcDrivers/gpio.c:195:6:GPIO_IRQ_Priority	32	static
+../myDrivers/SrcDrivers/gpio.c:210:6:GPIO_IRQ_Handling	16	static

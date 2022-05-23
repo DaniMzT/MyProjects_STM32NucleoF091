@@ -1,0 +1,81 @@
+/*
+ * gpio.c
+ *
+ *  Created on: May 19, 2022
+ *      Author: danim
+ */
+
+#include "gpio.h"
+/*********GPIO clock control***************/
+void GPIO_ClockControl(GPIO_RegStruct_t *pGPIO, uint8_t EnableDisable){
+
+	if (EnableDisable == ENABLE) {
+		switch (pGPIO) {
+			case GPIOA:
+				GPIOA_EnableClock();
+				break;
+			case GPIOA:
+				GPIOA_EnableClock();
+				break;
+			case GPIOB:
+				GPIOB_EnableClock();
+				break;
+			case GPIOC:
+				GPIOC_EnableClock();
+				break;
+			case GPIOD:
+				GPIOD_EnableClock();
+				break;
+			case GPIOE:
+				GPIOE_EnableClock();
+				break;
+			case GPIOF:
+				GPIOF_EnableClock();
+				break;
+			default:
+				break;
+		}
+	}
+	else{
+		switch (pGPIO) {
+			case GPIOA:
+				GPIOA_DisableClock();
+				break;
+			case GPIOA:
+				GPIOA_DisableClock();
+				break;
+			case GPIOB:
+				GPIOB_DisableClock();
+				break;
+			case GPIOC:
+				GPIOC_DisableClock();
+				break;
+			case GPIOD:
+				GPIOD_DisableClock();
+				break;
+			case GPIOE:
+				GPIOE_DisableClock();
+				break;
+			case GPIOF:
+				GPIOF_DisableClock();
+				break;
+			default:
+				break;
+		}
+	}
+}
+/*********GPIO pin initialization*************/
+void GPIO_PinInit(GPIO_PinHandle_t *GPIO_PinHandle){
+
+	//enable GPIO port clock
+	GPIO_ClockControl(GPIO_PinHandle->pGPIO,ENABLE);
+
+	//configure mode
+	// first,reset the 2 bits related to the pin.ex:pin number 1 is for MODER bits 2 and 3.3<<2*pin is 3<<2 aka 1100b.so MODER&=(~1100)=x..x00xx
+	GPIO_PinHandle->pGPIO->MODER &= (~(3<<(2*GPIO_PinHandle->GPIO_PinConfig.GPIO_PinNumber)));
+	switch (GPIO_PinHandle->GPIO_PinConfig.GPIO_PinMode){
+		case GPIO_IN:
+			GPIO_PinHandle->pGPIO->MODER |= (GPIO_IN<<(2*GPIO_PinHandle->GPIO_PinConfig.GPIO_PinNumber));
+			break;
+	}
+}

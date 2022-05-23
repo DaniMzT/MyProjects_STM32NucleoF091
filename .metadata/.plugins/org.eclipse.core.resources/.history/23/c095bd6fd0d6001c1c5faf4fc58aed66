@@ -1,0 +1,15 @@
+/*
+ * stm32f091rct6.h
+ *
+ *  Created on: May 18, 2022
+ *      Author: danim
+ */
+
+#ifndef INCDRIVERS_STM32F091RCT6_H_
+#define INCDRIVERS_STM32F091RCT6_H_
+
+/*BASE ADDRESSES OF MEMORIES: FLASH AND SRAM */
+#define FLASH_BASE_ADDR		0x08000000U
+#define SRAM_BASE_ADDR		0x20000000U
+
+#endif /* INCDRIVERS_STM32F091RCT6_H_ */

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;Train_ButtonsLeds/Drivers&apos; to &apos;myDrivers&apos;" description="Rename resource &apos;Drivers&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Drivers" name="myDrivers" stamp="1652892597399" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;Train/Src/main.c&apos; to &apos;trainButtonsLedsInterrupts.c&apos;" description="Rename resource &apos;main.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Src/main.c" name="trainButtonsLedsInterrupts.c" stamp="1653321093880" updateReferences="true"/>
+</session>

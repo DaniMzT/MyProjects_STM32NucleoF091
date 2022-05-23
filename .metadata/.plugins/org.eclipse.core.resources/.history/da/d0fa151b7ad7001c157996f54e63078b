@@ -1,0 +1,160 @@
+/*
+ * stm32f091rct6.h
+ *
+ *  Created on: May 18, 2022
+ *      Author: danim
+ */
+
+#ifndef INCDRIVERS_STM32F091RCT6_H_
+#define INCDRIVERS_STM32F091RCT6_H_
+
+/*****************************************ADDRESSES*****************************************/
+
+/*BASE ADDRESSES OF MEMORIES: FLASH AND SRAM */
+#define FLASH_BASE				0x08000000U
+#define SRAM_BASE				0x20000000U
+#define FLASH_SYSMEM_BASE		0x1FFFD800U
+
+/*BASE ADDRESSES OF BUSES */
+#define PERIPH_BUS_BASE			0x40000000U
+#define APB_BASE				PERIPH_BUS_BASE
+#define AHB1_BASE				0X40020000U
+#define AHB2_BASE				0X48000000U
+
+/*BASE ADDRESSES PERIPHERALS APB BUS*/
+#define TIM2_BASE				APB_BASE
+#define TIM3_BASE				(APB_BASE+0X0400)
+#define TIM6_BASE				(APB_BASE+0X1000)
+#define TIM7_BASE				(APB_BASE+0X1400)
+#define TIM14_BASE				(APB_BASE+0X2000)
+#define RTC_BASE				(APB_BASE+0X2800)
+#define WWDG_BASE				(APB_BASE+0X2C00)
+#define IWDG_BASE				(APB_BASE+0X2C00)
+#define SPI2_BASE				(APB_BASE+0X3800)
+#define USART2_BASE				(APB_BASE+0X4400)
+#define USART3_BASE				(APB_BASE+0X4800)
+#define USART4_BASE				(APB_BASE+0X4C00)
+#define USART5_BASE				(APB_BASE+0X5000)
+#define I2C1_BASE				(APB_BASE+0X5400)
+#define I2C2_BASE				(APB_BASE+0X5800)
+#define USB_BASE				(APB_BASE+0X5C00)
+#define USB_CAN_SRAM_BASE		(APB_BASE+0X6000)
+#define CAN_BASE				(APB_BASE+0X6400)
+#define CRS_BASE				(APB_BASE+0X6C00)
+#define PWR_BASE				(APB_BASE+0X7000)
+#define DAC_BASE				(APB_BASE+0X7400)
+#define CEC_BASE				(APB_BASE+0X7800)
+#define SYSCFG_COMP_BASE		(APB_BASE+0X10000)
+#define EXTI_BASE				(APB_BASE+0X10400)
+#define USART6_BASE				(APB_BASE+0X11400)
+#define USART7_BASE				(APB_BASE+0X11800)
+#define USART8_BASE				(APB_BASE+0X11C00)
+#define ADC_BASE				(APB_BASE+0X12400)
+#define TIM1_BASE				(APB_BASE+0X12C00)
+#define SPI1_I2S1_BASE			(APB_BASE+0X13000)
+#define USART1_BASE				(APB_BASE+0X13800)
+#define TIM15_BASE				(APB_BASE+0X14000)
+#define TIM16_BASE				(APB_BASE+0X14400)
+#define TIM17_BASE				(APB_BASE+0X14800)
+#define DBGMCU_BASE				(APB_BASE+0X15800)
+
+/*BASE ADDRESSES PERIPHERALS AHB1 BUS*/
+#define DMA_BASE				AHB1_BASE
+#define DMA2_BASE				(AHB2_BASE+0X0400)
+#define RCC_BASE				(AHB2_BASE+0X1000)
+#define FLASH_INT_BASE			(AHB2_BASE+0X2000)
+#define CRC_BASE				(AHB2_BASE+0X3000)
+#define TSC_BASE				(AHB2_BASE+0X4000)
+
+/*BASE ADDRESSES PERIPHERALS AHB2 BUS*/
+#define GPIOA_BASE				AHB2_BASE
+#define GPIOB_BASE				(AHB2_BASE+0X0400)
+#define GPIOC_BASE				(AHB2_BASE+0X0800)
+#define GPIOD_BASE				(AHB2_BASE+0X0C00)
+#define GPIOE_BASE				(AHB2_BASE+0X1000)
+#define GPIOF_BASE				(AHB2_BASE+0X1400)
+
+/******************************************STRUCTURES OF REGISTERS*****************************************/
+/************************CLOCK*******************/
+/*struct*/
+typedef struct{
+	volatile uint32_t CR;            /*!< Clock control register,     				Address offset: 0x00 */
+	volatile uint32_t CFGR;       /*!< Clock config register 1,     Address offset: 0x04 (due to 4 bytes uint32_t) */
+	volatile uint32_t CIR;          /*!< Clock interrupt register,     				Address offset: 0x08 */
+	volatile uint32_t APB2RSTR;           /*!< Reset APB2,     						Address offset: 0x0C */
+	volatile uint32_t APB1RSTR;      /*!< Reset APB1,     							Address offset: 0x10 */
+	volatile uint32_t AHBENR;      /*!< Enable AHB,     							Address offset: 0x14 */
+	volatile uint32_t APB2ENR;      /*!< Enable APB2,     							Address offset: 0x18 */
+	volatile uint32_t APB1ENR;     /*!< Enable APB1,                                Address offset: 0x1C */
+	volatile uint32_t BDCR;      /*!< RTC domain control register,     				Address offset: 0x20 */
+	volatile uint32_t CSR;      /*!< Control/status register,     					Address offset: 0x24 */
+	volatile uint32_t AHBRSTR;  /*!<Reset AHB,                                      Address offset: 0x28 */
+	volatile uint32_t CFGR2;       /*!< Clock config register 2,    				Address offset: 0x2C */
+	volatile uint32_t CFGR3;       /*!< Clock config register 3,     				Address offset: 0x30 */
+	volatile uint32_t CR2;       /*!< Clock control register 2,     				Address offset: 0x34 */
+}RCC_RegStruct_t;
+
+/*pointer*/
+#define RCC 				((RCC_RegStruct_t*)RCC_BASE)
+
+/********************EXTI***********************/
+//Extended interrupts and events controller. Between some interrupt sources (GPIOs...) and the NVIC
+
+/*struct*/
+typedef struct
+{
+	volatile uint32_t IMR;    /*!< Interrupt mask register,          	  	    Address offset: 0x00 */
+	volatile uint32_t EMR;    /*!< Event mask register,              Address offset: 0x04 (due to 4 bytes uint32_t)*/
+	volatile uint32_t RTSR;   /*!< Rising trigger selection,  					Address offset: 0x08 */
+	volatile uint32_t FTSR;   /*!< Falling trigger selection, 					Address offset: 0x0C */
+	volatile uint32_t SWIER;  /*!< SW interrupt event,  						Address offset: 0x10 */
+	volatile uint32_t PR;     /*!< Pending register (write to clear it!),          Address offset: 0x14 */
+}EXTI_RegStruct_t;
+
+/*pointer*/
+#define EXTI				((EXTI_RegStruct_t*)EXTI_BASE)
+
+/************************GPIO*******************/
+/*struct*/
+typedef struct
+{
+	volatile uint32_t MODER;			/*!< mode(input reset,general purp,AF,analog)         	Address offset: 0x00 */
+	volatile uint32_t OTYPER;           /*!< output(push-pull,open-drain)     					Address offset: 0x04*/
+	volatile uint32_t OSPEEDR;			/*!< output speed							         	Address offset: 0x08 */
+	volatile uint32_t PUPDR;			/*!< pull-up/down							         	Address offset: 0x0C */
+	volatile uint32_t IDR;				/*!< input register							         	Address offset: 0x10 */
+	volatile uint32_t ODR;				/*!< output register							        Address offset: 0x14 */
+	volatile uint32_t BSRR;				/*!< set/reset						         			Address offset: 0x18 */
+	volatile uint32_t LCKR;				/*!< lock							         			Address offset: 0x1C */
+	volatile uint32_t AFR[2];	/*!< AFR[0]:Altern.funct. low register, AF[1]:AF high    		Address offset: 0x20-0x24 */
+	volatile uint32_t BRR;				/*!< bit reset register							        Address offset: 0x28 */
+}GPIO_RegStruct_t;
+
+/*pointers*/
+#define GPIOA  				((GPIO_RegStruct_t*)GPIOA_BASEADDR)
+#define GPIOB  				((GPIO_RegStruct_t*)GPIOB_BASEADDR)
+#define GPIOC  				((GPIO_RegStruct_t*)GPIOC_BASEADDR)
+#define GPIOD  				((GPIO_RegStruct_t*)GPIOD_BASEADDR)
+#define GPIOE  				((GPIO_RegStruct_t*)GPIOE_BASEADDR)
+#define GPIOF  				((GPIO_RegStruct_t*)GPIOF_BASEADDR)
+
+/*enable GPIO port peripheral clocks*/
+#define GPIOA_EnableClock()	((RCC->AHBENR)|=(1<<17))
+#define GPIOB_EnableClock()	((RCC->AHBENR)|=(1<<18))
+#define GPIOC_EnableClock()	((RCC->AHBENR)|=(1<<19))
+#define GPIOD_EnableClock()	((RCC->AHBENR)|=(1<<20))
+#define GPIOE_EnableClock()	((RCC->AHBENR)|=(1<<21))
+#define GPIOF_EnableClock()	((RCC->AHBENR)|=(1<<22))
+
+/*disable GPIO port peripheral clocks*/
+#define GPIOA_DisableClock()	((RCC->AHBENR)&= (~(1<<17)))
+#define GPIOB_DisableClock()	((RCC->AHBENR)&= (~(1<<18)))
+#define GPIOC_DisableClock()	((RCC->AHBENR)&= (~(1<<19)))
+#define GPIOD_DisableClock()	((RCC->AHBENR)&= (~(1<<20)))
+#define GPIOE_DisableClock()	((RCC->AHBENR)&= (~(1<<21)))
+#define GPIOF_DisableClock()	((RCC->AHBENR)&= (~(1<<22)))
+
+/*************INCLUDE DRIVER HEADERS************/
+#include "gpio.h"
+
+#endif /* INCDRIVERS_STM32F091RCT6_H_ */
