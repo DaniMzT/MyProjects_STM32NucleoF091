@@ -9,7 +9,7 @@
 #define INCDRIVERS_GPIO_H_
 
 #include "stm32f091rct6.h"
-
+/*************************************************STRUCTS***********************************************************/
 /*structure to configure a GPIO pin, which will be linked to the registers(GPIO_RegStruct_t in stm32f091rct6.h) in the driver functions*/
 typedef struct{
 	uint8_t GPIO_PinNumber;
@@ -26,7 +26,7 @@ typedef struct{
 	GPIO_PinConfig_t GPIO_PinConfig;
 }GPIO_PinHandle_t;
 
-/*Macros*/
+/*************************************************MACROS***********************************************************/
 //Modes. 0-3 for MODER register; 4-6 for us to handle interrupts
 #define GPIO_IN 		0
 #define GPIO_OUT 		1
@@ -51,7 +51,7 @@ typedef struct{
 #define GPIO_PULLDOWN 		2
 #define GPIO_RESERVEDPULL	3
 
-/*********************************Prototypes of functions defined in gpio.c***********************************/
+/*********************************Prototypes of APIs (functions) defined in gpio.c***********************************/
 /*Enable or disable GPIO port peripheral clock*/
 void GPIO_ClockControl(GPIO_RegStruct_t *pGPIO, uint8_t EnableDisable);
 

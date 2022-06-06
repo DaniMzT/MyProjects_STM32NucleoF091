@@ -11,9 +11,9 @@ c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externalt
 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
                               c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/rdimon-crt0.o (memset)
 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-printf.o)
-                              ./Src/main.o (printf)
+                              ./Src/trainButtonsLedsInterrupts.o (printf)
 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-puts.o)
-                              ./Src/main.o (puts)
+                              ./Src/trainButtonsLedsInterrupts.o (puts)
 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-wbuf.o)
                               c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-puts.o) (__swbuf_r)
 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-wsetup.o)
@@ -99,48 +99,6 @@ Discarded input sections
  .ARM.exidx     0x0000000000000000       0x10 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/rdimon-crt0.o
  .ARM.attributes
                 0x0000000000000000       0x1b c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/rdimon-crt0.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .group         0x0000000000000000        0xc ./Src/main.o
- .text          0x0000000000000000        0x0 ./Src/main.o
- .data          0x0000000000000000        0x0 ./Src/main.o
- .bss           0x0000000000000000        0x0 ./Src/main.o
  .group         0x0000000000000000        0xc ./Src/sysmem.o
  .group         0x0000000000000000        0xc ./Src/sysmem.o
  .group         0x0000000000000000        0xc ./Src/sysmem.o
@@ -166,29 +124,73 @@ Discarded input sections
  .text          0x0000000000000000        0x0 ./Src/sysmem.o
  .data          0x0000000000000000        0x0 ./Src/sysmem.o
  .bss           0x0000000000000000        0x0 ./Src/sysmem.o
- .debug_macro   0x0000000000000000      0xa54 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x22 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x4c ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x18 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x94 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x3c ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x34 ./Src/sysmem.o
- .debug_macro   0x0000000000000000      0x174 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x16 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x43 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x57 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x34 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x10 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x58 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x71 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x1c ./Src/sysmem.o
- .debug_macro   0x0000000000000000      0x12a ./Src/sysmem.o
- .debug_macro   0x0000000000000000      0x103 ./Src/sysmem.o
- .debug_macro   0x0000000000000000       0x6a ./Src/sysmem.o
- .debug_macro   0x0000000000000000      0x1df ./Src/sysmem.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .group         0x0000000000000000        0xc ./Src/trainButtonsLedsInterrupts.o
+ .text          0x0000000000000000        0x0 ./Src/trainButtonsLedsInterrupts.o
+ .data          0x0000000000000000        0x0 ./Src/trainButtonsLedsInterrupts.o
+ .bss           0x0000000000000000        0x0 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000      0xa54 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x22 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x4c ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x18 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x94 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x3c ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x34 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000      0x174 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x16 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x43 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x57 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x34 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x10 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x58 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x71 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x1c ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000      0x12a ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000      0x103 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000       0x6a ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000000000      0x1df ./Src/trainButtonsLedsInterrupts.o
  .text          0x0000000000000000       0x14 ./Startup/startup_stm32f091rctx.o
  .data          0x0000000000000000        0x0 ./Startup/startup_stm32f091rctx.o
  .bss           0x0000000000000000        0x0 ./Startup/startup_stm32f091rctx.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/gpio.o
  .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/gpio.o
  .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/gpio.o
  .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/gpio.o
@@ -220,8 +222,78 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x6a ./myDrivers/SrcDrivers/gpio.o
  .debug_macro   0x0000000000000000      0x1df ./myDrivers/SrcDrivers/gpio.o
  .debug_macro   0x0000000000000000      0x174 ./myDrivers/SrcDrivers/gpio.o
- .debug_macro   0x0000000000000000      0x2a3 ./myDrivers/SrcDrivers/gpio.o
+ .debug_macro   0x0000000000000000      0x3ea ./myDrivers/SrcDrivers/gpio.o
  .debug_macro   0x0000000000000000       0x64 ./myDrivers/SrcDrivers/gpio.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .group         0x0000000000000000        0xc ./myDrivers/SrcDrivers/spi.o
+ .text          0x0000000000000000        0x0 ./myDrivers/SrcDrivers/spi.o
+ .data          0x0000000000000000        0x0 ./myDrivers/SrcDrivers/spi.o
+ .bss           0x0000000000000000        0x0 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_ClockControl
+                0x0000000000000000       0x94 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_Init
+                0x0000000000000000      0x11c ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_EnableDisable
+                0x0000000000000000       0x40 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_Reset
+                0x0000000000000000       0x50 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_SSI  0x0000000000000000       0x48 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_SSOE
+                0x0000000000000000       0x40 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_GetFlagStatus
+                0x0000000000000000       0x2a ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_IRQ_EnableDisable
+                0x0000000000000000       0x58 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_IRQ_Priority
+                0x0000000000000000       0x80 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_IRQ_Handling
+                0x0000000000000000       0x70 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_TXE_handler
+                0x0000000000000000       0x8a ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_RXNE_handler
+                0x0000000000000000       0x90 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_OVR_handler
+                0x0000000000000000       0x32 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_Send
+                0x0000000000000000       0x3e ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_Receive
+                0x0000000000000000       0x42 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_App_Callback
+                0x0000000000000000       0x16 ./myDrivers/SrcDrivers/spi.o
+ .text.SPI_ClearOVRFlag
+                0x0000000000000000       0x20 ./myDrivers/SrcDrivers/spi.o
+ .debug_info    0x0000000000000000      0x6d7 ./myDrivers/SrcDrivers/spi.o
+ .debug_abbrev  0x0000000000000000      0x170 ./myDrivers/SrcDrivers/spi.o
+ .debug_aranges
+                0x0000000000000000       0xa0 ./myDrivers/SrcDrivers/spi.o
+ .debug_ranges  0x0000000000000000       0x90 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0xa3 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000      0xa54 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0x22 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0x8e ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0x51 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000      0x103 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0x6a ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000      0x1df ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000      0x174 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000      0x3ea ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0x64 ./myDrivers/SrcDrivers/spi.o
+ .debug_macro   0x0000000000000000       0xc4 ./myDrivers/SrcDrivers/spi.o
+ .debug_line    0x0000000000000000      0x869 ./myDrivers/SrcDrivers/spi.o
+ .debug_str     0x0000000000000000     0x54a7 ./myDrivers/SrcDrivers/spi.o
+ .comment       0x0000000000000000       0x51 ./myDrivers/SrcDrivers/spi.o
+ .debug_frame   0x0000000000000000      0x230 ./myDrivers/SrcDrivers/spi.o
+ .ARM.attributes
+                0x0000000000000000       0x2c ./myDrivers/SrcDrivers/spi.o
  .text          0x0000000000000000        0x0 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-errno.o)
  .data          0x0000000000000000        0x0 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-errno.o)
  .bss           0x0000000000000000        0x0 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-errno.o)
@@ -475,10 +547,11 @@ Linker script and memory map
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crti.o
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/rdimon-crt0.o
-LOAD ./Src/main.o
 LOAD ./Src/sysmem.o
+LOAD ./Src/trainButtonsLedsInterrupts.o
 LOAD ./Startup/startup_stm32f091rctx.o
 LOAD ./myDrivers/SrcDrivers/gpio.o
+LOAD ./myDrivers/SrcDrivers/spi.o
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a
 START GROUP
@@ -535,18 +608,18 @@ LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
                 0x0000000008000240                __aeabi_idiv0
                 0x0000000008000240                __aeabi_ldiv0
  *(.text*)
- .text.delay    0x0000000008000244       0x28 ./Src/main.o
-                0x0000000008000244                delay
- .text.main     0x000000000800026c      0x1bc ./Src/main.o
-                0x000000000800026c                main
+ .text._sbrk    0x0000000008000244       0x6c ./Src/sysmem.o
+                0x0000000008000244                _sbrk
+ .text.delay    0x00000000080002b0       0x28 ./Src/trainButtonsLedsInterrupts.o
+                0x00000000080002b0                delay
+ .text.main     0x00000000080002d8      0x1bc ./Src/trainButtonsLedsInterrupts.o
+                0x00000000080002d8                main
  .text.EXTI2_3_IRQHandler
-                0x0000000008000428       0xb4 ./Src/main.o
-                0x0000000008000428                EXTI2_3_IRQHandler
+                0x0000000008000494       0xb4 ./Src/trainButtonsLedsInterrupts.o
+                0x0000000008000494                EXTI2_3_IRQHandler
  .text.EXTI4_15_IRQHandler
-                0x00000000080004dc       0x6c ./Src/main.o
-                0x00000000080004dc                EXTI4_15_IRQHandler
- .text._sbrk    0x0000000008000548       0x6c ./Src/sysmem.o
-                0x0000000008000548                _sbrk
+                0x0000000008000548       0x6c ./Src/trainButtonsLedsInterrupts.o
+                0x0000000008000548                EXTI4_15_IRQHandler
  .text.Reset_Handler
                 0x00000000080005b4       0x50 ./Startup/startup_stm32f091rctx.o
                 0x00000000080005b4                Reset_Handler
@@ -813,7 +886,7 @@ LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
 .rodata         0x00000000080021c8       0xc4
                 0x00000000080021c8                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x00000000080021c8       0x10 ./Src/main.o
+ .rodata        0x00000000080021c8       0x10 ./Src/trainButtonsLedsInterrupts.o
  *(.rodata*)
  .rodata._global_impure_ptr
                 0x00000000080021d8        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-impure.o)
@@ -902,60 +975,57 @@ LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .igot.plt      0x000000002000006c        0x0 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
                 0x000000002000006c                . = ALIGN (0x4)
 
-.bss            0x000000002000006c       0xe0 load address 0x0000000008002300
+.bss            0x000000002000006c       0xdc load address 0x0000000008002300
                 0x000000002000006c                _sbss = .
                 0x000000002000006c                __bss_start__ = _sbss
  *(.bss)
  .bss           0x000000002000006c       0x1c c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
  *(.bss*)
- .bss.currentState
-                0x0000000020000088        0x1 ./Src/main.o
-                0x0000000020000088                currentState
- *fill*         0x0000000020000089        0x3 
  .bss.__sbrk_heap_end
-                0x000000002000008c        0x4 ./Src/sysmem.o
+                0x0000000020000088        0x4 ./Src/sysmem.o
+ .bss.currentState
+                0x000000002000008c        0x1 ./Src/trainButtonsLedsInterrupts.o
+                0x000000002000008c                currentState
  .bss.__lock___malloc_recursive_mutex
-                0x0000000020000090        0x1 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-lock.o)
-                0x0000000020000090                __lock___malloc_recursive_mutex
+                0x000000002000008d        0x1 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-lock.o)
+                0x000000002000008d                __lock___malloc_recursive_mutex
  .bss.__lock___sfp_recursive_mutex
-                0x0000000020000091        0x1 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-lock.o)
-                0x0000000020000091                __lock___sfp_recursive_mutex
+                0x000000002000008e        0x1 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-lock.o)
+                0x000000002000008e                __lock___sfp_recursive_mutex
  .bss.__lock___sinit_recursive_mutex
-                0x0000000020000092        0x1 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-lock.o)
-                0x0000000020000092                __lock___sinit_recursive_mutex
- *fill*         0x0000000020000093        0x1 
+                0x000000002000008f        0x1 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-lock.o)
+                0x000000002000008f                __lock___sinit_recursive_mutex
  .bss.__malloc_free_list
-                0x0000000020000094        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-nano-mallocr.o)
-                0x0000000020000094                __malloc_free_list
+                0x0000000020000090        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-nano-mallocr.o)
+                0x0000000020000090                __malloc_free_list
  .bss.__malloc_sbrk_start
-                0x0000000020000098        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-nano-mallocr.o)
-                0x0000000020000098                __malloc_sbrk_start
- .bss.errno     0x000000002000009c        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-reent.o)
-                0x000000002000009c                errno
+                0x0000000020000094        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-nano-mallocr.o)
+                0x0000000020000094                __malloc_sbrk_start
+ .bss.errno     0x0000000020000098        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-reent.o)
+                0x0000000020000098                errno
  .bss.monitor_stderr
-                0x00000000200000a0        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
+                0x000000002000009c        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
  .bss.monitor_stdin
-                0x00000000200000a4        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
+                0x00000000200000a0        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
  .bss.monitor_stdout
-                0x00000000200000a8        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
+                0x00000000200000a4        0x4 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
  .bss.openfiles
-                0x00000000200000ac       0xa0 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
+                0x00000000200000a8       0xa0 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\librdimon_nano.a(rdimon-syscalls.o)
  *(COMMON)
-                0x000000002000014c                . = ALIGN (0x4)
-                0x000000002000014c                _ebss = .
-                0x000000002000014c                __bss_end__ = _ebss
+                0x0000000020000148                . = ALIGN (0x4)
+                0x0000000020000148                _ebss = .
+                0x0000000020000148                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x000000002000014c      0x604 load address 0x0000000008002300
-                0x0000000020000150                . = ALIGN (0x8)
- *fill*         0x000000002000014c        0x4 
-                0x0000000020000150                PROVIDE (end = .)
-                0x0000000020000150                PROVIDE (_end = .)
-                0x0000000020000350                . = (. + _Min_Heap_Size)
- *fill*         0x0000000020000150      0x200 
-                0x0000000020000750                . = (. + _Min_Stack_Size)
- *fill*         0x0000000020000350      0x400 
-                0x0000000020000750                . = ALIGN (0x8)
+                0x0000000020000148      0x600 load address 0x0000000008002300
+                0x0000000020000148                . = ALIGN (0x8)
+                0x0000000020000148                PROVIDE (end = .)
+                0x0000000020000148                PROVIDE (_end = .)
+                0x0000000020000348                . = (. + _Min_Heap_Size)
+ *fill*         0x0000000020000148      0x200 
+                0x0000000020000748                . = (. + _Min_Stack_Size)
+ *fill*         0x0000000020000348      0x400 
+                0x0000000020000748                . = ALIGN (0x8)
 
 /DISCARD/
  libc.a(*)
@@ -970,9 +1040,9 @@ LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .ARM.attributes
                 0x000000000000001e       0x2c c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
  .ARM.attributes
-                0x000000000000004a       0x2c ./Src/main.o
+                0x000000000000004a       0x2c ./Src/sysmem.o
  .ARM.attributes
-                0x0000000000000076       0x2c ./Src/sysmem.o
+                0x0000000000000076       0x2c ./Src/trainButtonsLedsInterrupts.o
  .ARM.attributes
                 0x00000000000000a2       0x21 ./Startup/startup_stm32f091rctx.o
  .ARM.attributes
@@ -1045,113 +1115,115 @@ LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
                 0x0000000000000643       0x1e c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_dvmd_tls.o)
  .ARM.attributes
                 0x0000000000000661       0x1e c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtn.o
-OUTPUT(Train_ButtonsLeds.elf elf32-littlearm)
+OUTPUT(Train.elf elf32-littlearm)
 LOAD linker stubs
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc.a
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libm.a
 LOAD c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a
 
 .debug_info     0x0000000000000000      0xb45
- .debug_info    0x0000000000000000      0x3ab ./Src/main.o
- .debug_info    0x00000000000003ab      0x171 ./Src/sysmem.o
+ .debug_info    0x0000000000000000      0x171 ./Src/sysmem.o
+ .debug_info    0x0000000000000171      0x3ab ./Src/trainButtonsLedsInterrupts.o
  .debug_info    0x000000000000051c       0x22 ./Startup/startup_stm32f091rctx.o
  .debug_info    0x000000000000053e      0x607 ./myDrivers/SrcDrivers/gpio.o
 
 .debug_abbrev   0x0000000000000000      0x39e
- .debug_abbrev  0x0000000000000000      0x19f ./Src/main.o
- .debug_abbrev  0x000000000000019f       0xbb ./Src/sysmem.o
+ .debug_abbrev  0x0000000000000000       0xbb ./Src/sysmem.o
+ .debug_abbrev  0x00000000000000bb      0x19f ./Src/trainButtonsLedsInterrupts.o
  .debug_abbrev  0x000000000000025a       0x12 ./Startup/startup_stm32f091rctx.o
  .debug_abbrev  0x000000000000026c      0x132 ./myDrivers/SrcDrivers/gpio.o
 
 .debug_aranges  0x0000000000000000       0xf0
  .debug_aranges
-                0x0000000000000000       0x38 ./Src/main.o
+                0x0000000000000000       0x20 ./Src/sysmem.o
  .debug_aranges
-                0x0000000000000038       0x20 ./Src/sysmem.o
+                0x0000000000000020       0x38 ./Src/trainButtonsLedsInterrupts.o
  .debug_aranges
                 0x0000000000000058       0x28 ./Startup/startup_stm32f091rctx.o
  .debug_aranges
                 0x0000000000000080       0x70 ./myDrivers/SrcDrivers/gpio.o
 
 .debug_ranges   0x0000000000000000       0xb8
- .debug_ranges  0x0000000000000000       0x28 ./Src/main.o
- .debug_ranges  0x0000000000000028       0x10 ./Src/sysmem.o
+ .debug_ranges  0x0000000000000000       0x10 ./Src/sysmem.o
+ .debug_ranges  0x0000000000000010       0x28 ./Src/trainButtonsLedsInterrupts.o
  .debug_ranges  0x0000000000000038       0x20 ./Startup/startup_stm32f091rctx.o
  .debug_ranges  0x0000000000000058       0x60 ./myDrivers/SrcDrivers/gpio.o
 
-.debug_macro    0x0000000000000000     0x24d5
- .debug_macro   0x0000000000000000      0x218 ./Src/main.o
- .debug_macro   0x0000000000000218      0xa54 ./Src/main.o
- .debug_macro   0x0000000000000c6c       0x22 ./Src/main.o
- .debug_macro   0x0000000000000c8e       0x4c ./Src/main.o
- .debug_macro   0x0000000000000cda       0x18 ./Src/main.o
- .debug_macro   0x0000000000000cf2       0x94 ./Src/main.o
- .debug_macro   0x0000000000000d86       0x3c ./Src/main.o
- .debug_macro   0x0000000000000dc2       0x34 ./Src/main.o
- .debug_macro   0x0000000000000df6      0x174 ./Src/main.o
- .debug_macro   0x0000000000000f6a       0x16 ./Src/main.o
- .debug_macro   0x0000000000000f80       0x43 ./Src/main.o
- .debug_macro   0x0000000000000fc3       0x57 ./Src/main.o
- .debug_macro   0x000000000000101a       0x34 ./Src/main.o
- .debug_macro   0x000000000000104e       0x10 ./Src/main.o
- .debug_macro   0x000000000000105e       0x58 ./Src/main.o
- .debug_macro   0x00000000000010b6       0x71 ./Src/main.o
- .debug_macro   0x0000000000001127       0x1c ./Src/main.o
- .debug_macro   0x0000000000001143      0x12a ./Src/main.o
- .debug_macro   0x000000000000126d      0x341 ./Src/main.o
- .debug_macro   0x00000000000015ae       0x10 ./Src/main.o
- .debug_macro   0x00000000000015be       0x35 ./Src/main.o
- .debug_macro   0x00000000000015f3       0x20 ./Src/main.o
- .debug_macro   0x0000000000001613      0x103 ./Src/main.o
- .debug_macro   0x0000000000001716       0x6a ./Src/main.o
- .debug_macro   0x0000000000001780      0x1df ./Src/main.o
- .debug_macro   0x000000000000195f       0x1c ./Src/main.o
- .debug_macro   0x000000000000197b       0x10 ./Src/main.o
- .debug_macro   0x000000000000198b       0x10 ./Src/main.o
- .debug_macro   0x000000000000199b       0x1c ./Src/main.o
- .debug_macro   0x00000000000019b7       0x52 ./Src/main.o
- .debug_macro   0x0000000000001a09       0x22 ./Src/main.o
- .debug_macro   0x0000000000001a2b       0x10 ./Src/main.o
- .debug_macro   0x0000000000001a3b       0x52 ./Src/main.o
- .debug_macro   0x0000000000001a8d       0xd5 ./Src/main.o
- .debug_macro   0x0000000000001b62       0x1c ./Src/main.o
- .debug_macro   0x0000000000001b7e       0x3d ./Src/main.o
- .debug_macro   0x0000000000001bbb       0x16 ./Src/main.o
- .debug_macro   0x0000000000001bd1      0x145 ./Src/main.o
- .debug_macro   0x0000000000001d16      0x2a3 ./Src/main.o
- .debug_macro   0x0000000000001fb9       0x64 ./Src/main.o
- .debug_macro   0x000000000000201d       0xff ./Src/sysmem.o
- .debug_macro   0x000000000000211c       0x10 ./Src/sysmem.o
- .debug_macro   0x000000000000212c      0x23b ./Src/sysmem.o
- .debug_macro   0x0000000000002367       0x8f ./myDrivers/SrcDrivers/gpio.o
- .debug_macro   0x00000000000023f6       0x8e ./myDrivers/SrcDrivers/gpio.o
- .debug_macro   0x0000000000002484       0x51 ./myDrivers/SrcDrivers/gpio.o
+.debug_macro    0x0000000000000000     0x27c8
+ .debug_macro   0x0000000000000000       0xff ./Src/sysmem.o
+ .debug_macro   0x00000000000000ff      0xa54 ./Src/sysmem.o
+ .debug_macro   0x0000000000000b53       0x10 ./Src/sysmem.o
+ .debug_macro   0x0000000000000b63       0x22 ./Src/sysmem.o
+ .debug_macro   0x0000000000000b85       0x4c ./Src/sysmem.o
+ .debug_macro   0x0000000000000bd1       0x18 ./Src/sysmem.o
+ .debug_macro   0x0000000000000be9       0x94 ./Src/sysmem.o
+ .debug_macro   0x0000000000000c7d       0x3c ./Src/sysmem.o
+ .debug_macro   0x0000000000000cb9       0x34 ./Src/sysmem.o
+ .debug_macro   0x0000000000000ced      0x174 ./Src/sysmem.o
+ .debug_macro   0x0000000000000e61       0x16 ./Src/sysmem.o
+ .debug_macro   0x0000000000000e77       0x43 ./Src/sysmem.o
+ .debug_macro   0x0000000000000eba       0x57 ./Src/sysmem.o
+ .debug_macro   0x0000000000000f11       0x34 ./Src/sysmem.o
+ .debug_macro   0x0000000000000f45       0x10 ./Src/sysmem.o
+ .debug_macro   0x0000000000000f55       0x58 ./Src/sysmem.o
+ .debug_macro   0x0000000000000fad       0x71 ./Src/sysmem.o
+ .debug_macro   0x000000000000101e       0x1c ./Src/sysmem.o
+ .debug_macro   0x000000000000103a      0x12a ./Src/sysmem.o
+ .debug_macro   0x0000000000001164      0x23b ./Src/sysmem.o
+ .debug_macro   0x000000000000139f      0x103 ./Src/sysmem.o
+ .debug_macro   0x00000000000014a2       0x6a ./Src/sysmem.o
+ .debug_macro   0x000000000000150c      0x1df ./Src/sysmem.o
+ .debug_macro   0x00000000000016eb      0x222 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x000000000000190d      0x341 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001c4e       0x10 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001c5e       0x35 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001c93       0x20 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001cb3       0x1c ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001ccf       0x10 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001cdf       0x10 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001cef       0x1c ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001d0b       0x52 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001d5d       0x22 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001d7f       0x10 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001d8f       0x52 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001de1       0xd5 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001eb6       0x1c ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001ed2       0x3d ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001f0f       0x16 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000001f25      0x145 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x000000000000206a      0x3ea ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000002454       0x64 ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x00000000000024b8       0xca ./Src/trainButtonsLedsInterrupts.o
+ .debug_macro   0x0000000000002582       0xa3 ./myDrivers/SrcDrivers/gpio.o
+ .debug_macro   0x0000000000002625       0x8e ./myDrivers/SrcDrivers/gpio.o
+ .debug_macro   0x00000000000026b3       0x51 ./myDrivers/SrcDrivers/gpio.o
+ .debug_macro   0x0000000000002704       0xc4 ./myDrivers/SrcDrivers/gpio.o
 
-.debug_line     0x0000000000000000     0x146a
- .debug_line    0x0000000000000000      0x6f6 ./Src/main.o
- .debug_line    0x00000000000006f6      0x4e0 ./Src/sysmem.o
- .debug_line    0x0000000000000bd6       0x84 ./Startup/startup_stm32f091rctx.o
- .debug_line    0x0000000000000c5a      0x810 ./myDrivers/SrcDrivers/gpio.o
+.debug_line     0x0000000000000000     0x147a
+ .debug_line    0x0000000000000000      0x4e0 ./Src/sysmem.o
+ .debug_line    0x00000000000004e0      0x709 ./Src/trainButtonsLedsInterrupts.o
+ .debug_line    0x0000000000000be9       0x84 ./Startup/startup_stm32f091rctx.o
+ .debug_line    0x0000000000000c6d      0x80d ./myDrivers/SrcDrivers/gpio.o
 
-.debug_str      0x0000000000000000     0x9032
- .debug_str     0x0000000000000000     0x89ac ./Src/main.o
-                                       0x8ba6 (size before relaxing)
- .debug_str     0x00000000000089ac      0x4d5 ./Src/sysmem.o
-                                       0x5cae (size before relaxing)
- .debug_str     0x0000000000008e81       0x31 ./Startup/startup_stm32f091rctx.o
-                                         0x75 (size before relaxing)
- .debug_str     0x0000000000008eb2      0x180 ./myDrivers/SrcDrivers/gpio.o
-                                       0x4eb4 (size before relaxing)
+.debug_str      0x0000000000000000     0x95d4
+ .debug_str     0x0000000000000000     0x5aa0 ./Src/sysmem.o
+                                       0x5ca2 (size before relaxing)
+ .debug_str     0x0000000000005aa0     0x3983 ./Src/trainButtonsLedsInterrupts.o
+                                       0x9148 (size before relaxing)
+ .debug_str     0x0000000000009423       0x31 ./Startup/startup_stm32f091rctx.o
+                                         0x69 (size before relaxing)
+ .debug_str     0x0000000000009454      0x180 ./myDrivers/SrcDrivers/gpio.o
+                                       0x5440 (size before relaxing)
 
 .comment        0x0000000000000000       0x50
- .comment       0x0000000000000000       0x50 ./Src/main.o
+ .comment       0x0000000000000000       0x50 ./Src/sysmem.o
                                          0x51 (size before relaxing)
- .comment       0x0000000000000050       0x51 ./Src/sysmem.o
+ .comment       0x0000000000000050       0x51 ./Src/trainButtonsLedsInterrupts.o
  .comment       0x0000000000000050       0x51 ./myDrivers/SrcDrivers/gpio.o
 
 .debug_frame    0x0000000000000000      0xe44
- .debug_frame   0x0000000000000000       0x8c ./Src/main.o
- .debug_frame   0x000000000000008c       0x30 ./Src/sysmem.o
+ .debug_frame   0x0000000000000000       0x30 ./Src/sysmem.o
+ .debug_frame   0x0000000000000030       0x8c ./Src/trainButtonsLedsInterrupts.o
  .debug_frame   0x00000000000000bc      0x174 ./myDrivers/SrcDrivers/gpio.o
  .debug_frame   0x0000000000000230       0x20 c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-errno.o)
  .debug_frame   0x0000000000000250       0x2c c:/st/stm32cubeide_1.9.0/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-init.o)

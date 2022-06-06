@@ -62,7 +62,7 @@ void GPIO_PinInit(GPIO_PinHandle_t *GPIO_PinHandle){
 
 	//configure MODE: if not interrupt, mode is input/output/analog/alternate function
 	if ((GPIO_PinHandle->GPIO_PinConfig.GPIO_PinMode)<=GPIO_ANA){
-		// first,reset the 2 bits related to pin.ex:pin number 1 is for MODER bits 2 and 3.3<<2*pin is 3<<2 aka 1100b.so MODER&=(~1100)=x..x00xx
+		// first,reset the 2 bits related to pin.ex:pin number 1 is for MODER bits 2 and 3. 3<<2*pin is 3<<2 aka 1100b.so MODER&=(~1100)=x..x00xx
 		GPIO_PinHandle->pGPIO->MODER &= (~(3<<(2*GPIO_PinHandle->GPIO_PinConfig.GPIO_PinNumber))); //I guess I can use 3 instead of 0x3
 		//now set
 		GPIO_PinHandle->pGPIO->MODER |= (GPIO_PinHandle->GPIO_PinConfig.GPIO_PinMode<<(2*GPIO_PinHandle->GPIO_PinConfig.GPIO_PinNumber));

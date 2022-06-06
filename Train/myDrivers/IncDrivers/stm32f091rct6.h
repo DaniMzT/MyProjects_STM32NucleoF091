@@ -112,25 +112,27 @@
 /******************************************GENERIC MACROS**************************************************/
 #define DISABLE					0
 #define ENABLE					1
+#define FLAG_NOT_SET			0
+#define FLAG_SET				1
 
 /******************************************STRUCTURES OF REGISTERS*****************************************/
 /************************CLOCK*******************/
 /*struct*/
 typedef struct{
-	volatile uint32_t CR;            /*!< Clock control register,     				Address offset: 0x00 */
-	volatile uint32_t CFGR;       /*!< Clock config register 1,     Address offset: 0x04 (due to 4 bytes uint32_t) */
-	volatile uint32_t CIR;          /*!< Clock interrupt register,     				Address offset: 0x08 */
-	volatile uint32_t APB2RSTR;           /*!< Reset APB2,     						Address offset: 0x0C */
-	volatile uint32_t APB1RSTR;      /*!< Reset APB1,     							Address offset: 0x10 */
-	volatile uint32_t AHBENR;      /*!< Enable AHB,     							Address offset: 0x14 */
-	volatile uint32_t APB2ENR;      /*!< Enable APB2,     							Address offset: 0x18 */
-	volatile uint32_t APB1ENR;     /*!< Enable APB1,                                Address offset: 0x1C */
-	volatile uint32_t BDCR;      /*!< RTC domain control register,     				Address offset: 0x20 */
-	volatile uint32_t CSR;      /*!< Control/status register,     					Address offset: 0x24 */
-	volatile uint32_t AHBRSTR;  /*!<Reset AHB,                                      Address offset: 0x28 */
-	volatile uint32_t CFGR2;       /*!< Clock config register 2,    				Address offset: 0x2C */
-	volatile uint32_t CFGR3;       /*!< Clock config register 3,     				Address offset: 0x30 */
-	volatile uint32_t CR2;       /*!< Clock control register 2,     				Address offset: 0x34 */
+	volatile uint32_t CR;            /* Clock control register,     				Address offset: 0x00 */
+	volatile uint32_t CFGR;       /* Clock config register 1,     Address offset: 0x04 (due to 4 bytes uint32_t) */
+	volatile uint32_t CIR;          /* Clock interrupt register,     				Address offset: 0x08 */
+	volatile uint32_t APB2RSTR;           /* Reset APB2,     						Address offset: 0x0C */
+	volatile uint32_t APB1RSTR;      /* Reset APB1,     							Address offset: 0x10 */
+	volatile uint32_t AHBENR;      /* Enable AHB,     							Address offset: 0x14 */
+	volatile uint32_t APB2ENR;      /* Enable APB2,     							Address offset: 0x18 */
+	volatile uint32_t APB1ENR;     /* Enable APB1,                                Address offset: 0x1C */
+	volatile uint32_t BDCR;      /* RTC domain control register,     				Address offset: 0x20 */
+	volatile uint32_t CSR;      /* Control/status register,     					Address offset: 0x24 */
+	volatile uint32_t AHBRSTR;  /*Reset AHB,                                      Address offset: 0x28 */
+	volatile uint32_t CFGR2;       /* Clock config register 2,    				Address offset: 0x2C */
+	volatile uint32_t CFGR3;       /* Clock config register 3,     				Address offset: 0x30 */
+	volatile uint32_t CR2;       /* Clock control register 2,     				Address offset: 0x34 */
 }RCC_RegStruct_t;
 
 /*pointer*/
@@ -142,12 +144,12 @@ typedef struct{
 /*struct*/
 typedef struct
 {
-	volatile uint32_t IMR;    /*!< Interrupt mask register,          	  	    Address offset: 0x00 */
-	volatile uint32_t EMR;    /*!< Event mask register,              Address offset: 0x04 (due to 4 bytes uint32_t)*/
-	volatile uint32_t RTSR;   /*!< Rising trigger selection,  					Address offset: 0x08 */
-	volatile uint32_t FTSR;   /*!< Falling trigger selection, 					Address offset: 0x0C */
-	volatile uint32_t SWIER;  /*!< SW interrupt event,  						Address offset: 0x10 */
-	volatile uint32_t PR;     /*!< Pending register (write to clear it!),          Address offset: 0x14 */
+	volatile uint32_t IMR;    /* Interrupt mask register,          	  	    Address offset: 0x00 */
+	volatile uint32_t EMR;    /* Event mask register,              Address offset: 0x04 (due to 4 bytes uint32_t)*/
+	volatile uint32_t RTSR;   /* Rising trigger selection,  					Address offset: 0x08 */
+	volatile uint32_t FTSR;   /* Falling trigger selection, 					Address offset: 0x0C */
+	volatile uint32_t SWIER;  /* SW interrupt event,  						Address offset: 0x10 */
+	volatile uint32_t PR;     /* Pending register (write to clear it!),          Address offset: 0x14 */
 }EXTI_RegStruct_t;
 
 /*pointer*/
@@ -157,16 +159,16 @@ typedef struct
 /*struct*/
 typedef struct
 {
-	volatile uint32_t MODER;			/*!< mode(input,general purp,AF,analog)         	Address offset: 0x00 */
-	volatile uint32_t OTYPER;           /*!< output(push-pull,open-drain)     					Address offset: 0x04*/
-	volatile uint32_t OSPEEDR;			/*!< output speed							         	Address offset: 0x08 */
-	volatile uint32_t PUPDR;			/*!< pull-up/down							         	Address offset: 0x0C */
-	volatile uint32_t IDR;				/*!< input register							         	Address offset: 0x10 */
-	volatile uint32_t ODR;				/*!< output register							        Address offset: 0x14 */
-	volatile uint32_t BSRR;				/*!< set/reset						         			Address offset: 0x18 */
-	volatile uint32_t LCKR;				/*!< lock							         			Address offset: 0x1C */
-	volatile uint32_t AFR[2];	/*!< AFR[0]:Altern.funct. low register, AF[1]:AF high    		Address offset: 0x20-0x24 */
-	volatile uint32_t BRR;				/*!< bit reset register							        Address offset: 0x28 */
+	volatile uint32_t MODER;			/* mode(input,general purp,AF,analog)         	Address offset: 0x00 */
+	volatile uint32_t OTYPER;           /* output(push-pull,open-drain)     					Address offset: 0x04*/
+	volatile uint32_t OSPEEDR;			/* output speed							         	Address offset: 0x08 */
+	volatile uint32_t PUPDR;			/* pull-up/down							         	Address offset: 0x0C */
+	volatile uint32_t IDR;				/* input register							         	Address offset: 0x10 */
+	volatile uint32_t ODR;				/* output register							        Address offset: 0x14 */
+	volatile uint32_t BSRR;				/* set/reset						         			Address offset: 0x18 */
+	volatile uint32_t LCKR;				/* lock							         			Address offset: 0x1C */
+	volatile uint32_t AFR[2];	/* AFR[0]:Altern.funct. low register, AF[1]:AF high    		Address offset: 0x20-0x24 */
+	volatile uint32_t BRR;				/* bit reset register							        Address offset: 0x28 */
 }GPIO_RegStruct_t;
 
 /*pointers*/
@@ -213,10 +215,10 @@ typedef struct
 //struct
 typedef struct
 {
-	volatile uint32_t CFGR1;       /*!< configuration 1                  Address offset: 0x00      */
+	volatile uint32_t CFGR1;       /* configuration 1                  Address offset: 0x00      */
 	volatile uint32_t RESERVED1;          /*  									  Address offset: 0x04      */
 	volatile uint32_t EXTICR[4];	/*4 external interrupt  config registers 	Address offset: 0x08-0x14 */
-	volatile uint32_t CFGR2;    /*!<configuration 2							Address offset: 0x18 */
+	volatile uint32_t CFGR2;    /*configuration 2							Address offset: 0x18 */
 	/*CREATE ITLINEs in another struct? they start at offset 0x80!*/
 } SYSCFG_RegStruct_t;
 
@@ -226,7 +228,84 @@ typedef struct
 //enable clock for SYSCFG
 #define SYSCFG_EnableClock()		((RCC->APB2ENR) |= (1<<0))	/*SYSCFGCOMP is bit 0 in APB2ENR, which is in RCC */
 
+/*************************SPI/I2S(not I2C!! I2S is sound related)*****************************/
+//struct referred to registers
+typedef struct
+{
+	volatile uint32_t SPI_CR1;       /*control register 1                  Address offset: 0x00      */
+	volatile uint32_t SPI_CR2;       /*control register 2  					Address offset: 0x04      */
+	volatile uint32_t SPI_SR;       /*status register  						Address offset: 0x08 */
+	volatile uint32_t SPI_DR;       /*data register 						Address offset: 0x0C */
+	volatile uint32_t SPI_CRCPR;       /*CRC polyn. register 				Address offset: 0x10 */
+	volatile uint32_t SPI_RXCRC;       /*RX CRC register 				Address offset: 0x14 */
+	volatile uint32_t SPI_TXCRC;       /*TX CRC register 				Address offset: 0x18 */
+	volatile uint32_t SPI_I2S;       /*SPI(0) or I2S(1) 				Address offset: 0x1C */
+	volatile uint32_t SPI_I2S_PR;       /*Prescaler register 			Address offset: 0x20 */
+
+} SPI_RegStruct_t;
+
+//pointer
+#define SPI1_I2S1				((SPI_RegStruct_t*)SPI1_I2S1_BASE)
+#define SPI2					((SPI_RegStruct_t*)SPI2_BASE)
+
+//enable SPI peripheral clock
+#define SPI1_I2S1_EnableClock()		((RCC->APB2ENR)|=(1<<12))
+#define SPI2_EnableClock()			((RCC->APB1ENR)|=(1<<14))
+
+//disable SPI peripheral clock
+#define SPI1_I2S1_DisableClock()		((RCC->APB2ENR)&=(~(1<<12)))
+#define SPI2_DisableClock()			((RCC->APB1ENR)&=(~(1<<14)))
+
+//Reset SPI peripheral clock
+#define SPI1_ResetClock()		((RCC->APB2RSTR)|=(1<<12))
+#define SPI2_ResetClock()			((RCC->APB1RSTR)|=(1<<14))
+
+//Bits of the SPI registers
+//SPI_CR1
+#define SPI_CR1_CPHA     				 0
+#define SPI_CR1_CPOL      				 1
+#define SPI_CR1_MSTR     				 2
+#define SPI_CR1_BR   					 3
+#define SPI_CR1_SPE     				 6
+#define SPI_CR1_LSBFIRST   			 	 7
+#define SPI_CR1_SSI     				 8
+#define SPI_CR1_SSM      				 9
+#define SPI_CR1_RXONLY      		 	10
+#define SPI_CR1_CRCL     			 	11 //Cyclic Redundancy Check, not data size (this is DS in CR2)
+#define SPI_CR1_CRCNEXT   			 	12
+#define SPI_CR1_CRCEN   			 	13
+#define SPI_CR1_BIDIOE     			 	14
+#define SPI_CR1_BIDIMODE      			15
+
+//Bit position definitions SPI_CR2
+#define SPI_CR2_RXDMAEN		 			0
+#define SPI_CR2_TXDMAEN				 	1
+#define SPI_CR2_SSOE				 	2
+#define SPI_CR2_NSSP				 	3
+#define SPI_CR2_FRF						4
+#define SPI_CR2_ERRIE					5
+#define SPI_CR2_RXNEIE				 	6
+#define SPI_CR2_TXEIE					7
+#define SPI_CR2_DS						8
+#define SPI_CR2_FRXTH					12
+#define SPI_CR2_LDMA_RX					13
+#define SPI_CR2_LDMA_TX					14
+
+//Bit position definitions SPI_SR
+#define SPI_SR_RXNE						0
+#define SPI_SR_TXE				 		1
+#define SPI_SR_CHSIDE				 	2
+#define SPI_SR_UDR					 	3
+#define SPI_SR_CRCERR				 	4
+#define SPI_SR_MODF					 	5
+#define SPI_SR_OVR					 	6
+#define SPI_SR_BSY					 	7
+#define SPI_SR_FRE					 	8
+#define SPI_SR_FRLVL					9
+#define SPI_SR_FTLVL				 	11
+
 /*************INCLUDE DRIVER HEADERS************/
 #include "gpio.h"
+#include "spi.h"
 
 #endif /* INCDRIVERS_STM32F091RCT6_H_ */

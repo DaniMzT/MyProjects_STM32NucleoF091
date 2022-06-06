@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Train_ButtonsLeds
+BUILD_ARTIFACT_NAME := Train
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Train_ButtonsLeds.elf \
+Train.elf \
 
 MAP_FILES += \
-Train_ButtonsLeds.map \
+Train.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Train_ButtonsLeds.list \
+Train.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Train_ButtonsLeds.elf secondary-outputs
+main-build: Train.elf secondary-outputs
 
 # Tool invocations
-Train_ButtonsLeds.elf Train_ButtonsLeds.map: $(OBJS) $(USER_OBJS) C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train_ButtonsLeds\STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Train_ButtonsLeds.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train_ButtonsLeds\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Train_ButtonsLeds.map" -Wl,--gc-sections -static -specs=rdimon.specs -lc -lrdimon --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Train.elf Train.map: $(OBJS) $(USER_OBJS) C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train\STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Train.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Train.map" -Wl,--gc-sections -static -specs=rdimon.specs -lc -lrdimon --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Train_ButtonsLeds.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Train_ButtonsLeds.list"
+Train.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Train.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) Train_ButtonsLeds.elf Train_ButtonsLeds.list Train_ButtonsLeds.map default.size.stdout
+	-$(RM) Train.elf Train.list Train.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

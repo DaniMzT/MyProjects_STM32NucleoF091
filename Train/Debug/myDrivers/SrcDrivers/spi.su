@@ -1,0 +1,17 @@
+../myDrivers/SrcDrivers/spi.c:16:6:SPI_ClockControl	16	static
+../myDrivers/SrcDrivers/spi.c:36:6:SPI_Init	16	static
+../myDrivers/SrcDrivers/spi.c:80:6:SPI_EnableDisable	16	static
+../myDrivers/SrcDrivers/spi.c:91:6:SPI_Reset	16	static
+../myDrivers/SrcDrivers/spi.c:101:6:SPI_SSI	16	static
+../myDrivers/SrcDrivers/spi.c:111:6:SPI_SSOE	16	static
+../myDrivers/SrcDrivers/spi.c:121:9:SPI_GetFlagStatus	16	static
+../myDrivers/SrcDrivers/spi.c:134:6:SPI_IRQ_EnableDisable	16	static
+../myDrivers/SrcDrivers/spi.c:143:6:SPI_IRQ_Priority	32	static
+../myDrivers/SrcDrivers/spi.c:159:6:SPI_IRQ_Handling	16	static
+../myDrivers/SrcDrivers/spi.c:190:13:SPI_TXE_handler	16	static
+../myDrivers/SrcDrivers/spi.c:215:13:SPI_RXNE_handler	16	static
+../myDrivers/SrcDrivers/spi.c:239:13:SPI_OVR_handler	24	static
+../myDrivers/SrcDrivers/spi.c:252:6:SPI_Send	24	static
+../myDrivers/SrcDrivers/spi.c:261:6:SPI_Receive	24	static
+../myDrivers/SrcDrivers/spi.c:272:28:SPI_App_Callback	16	static
+../myDrivers/SrcDrivers/spi.c:277:6:SPI_ClearOVRFlag	24	static

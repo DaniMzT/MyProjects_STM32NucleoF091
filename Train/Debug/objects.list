@@ -1,4 +1,5 @@
-"./Src/main.o"
 "./Src/sysmem.o"
+"./Src/trainButtonsLedsInterrupts.o"
 "./Startup/startup_stm32f091rctx.o"
 "./myDrivers/SrcDrivers/gpio.o"
+"./myDrivers/SrcDrivers/spi.o"
