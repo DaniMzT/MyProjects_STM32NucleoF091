@@ -106,9 +106,6 @@
 #define IRQ_USART2	    28
 #define IRQ_USART3_TO_8	    29
 
-
-
-
 /******************************************GENERIC MACROS**************************************************/
 #define DISABLE					0
 #define ENABLE					1

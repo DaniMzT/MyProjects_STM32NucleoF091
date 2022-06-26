@@ -5,26 +5,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../myDrivers/SrcDrivers/gpio.c \
-../myDrivers/SrcDrivers/spi.c 
+../Src/sysmem.c \
+../Src/trainSPI_Arduino_debugSemihosting.c 
 
 OBJS += \
-./myDrivers/SrcDrivers/gpio.o \
-./myDrivers/SrcDrivers/spi.o 
+./Src/sysmem.o \
+./Src/trainSPI_Arduino_debugSemihosting.o 
 
 C_DEPS += \
-./myDrivers/SrcDrivers/gpio.d \
-./myDrivers/SrcDrivers/spi.d 
+./Src/sysmem.d \
+./Src/trainSPI_Arduino_debugSemihosting.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-myDrivers/SrcDrivers/%.o myDrivers/SrcDrivers/%.su: ../myDrivers/SrcDrivers/%.c myDrivers/SrcDrivers/subdir.mk
+Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F0 -DSTM32F091RCTx -c -I../Inc -I"C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers" -O0 -ffunction-sections -fdata-sections -Wall -specs=rdimon.specs -lc -lrdimon -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
 
-clean: clean-myDrivers-2f-SrcDrivers
+clean: clean-Src
 
-clean-myDrivers-2f-SrcDrivers:
-	-$(RM) ./myDrivers/SrcDrivers/gpio.d ./myDrivers/SrcDrivers/gpio.o ./myDrivers/SrcDrivers/gpio.su ./myDrivers/SrcDrivers/spi.d ./myDrivers/SrcDrivers/spi.o ./myDrivers/SrcDrivers/spi.su
+clean-Src:
+	-$(RM) ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/trainSPI_Arduino_debugSemihosting.d ./Src/trainSPI_Arduino_debugSemihosting.o ./Src/trainSPI_Arduino_debugSemihosting.su
 
-.PHONY: clean-myDrivers-2f-SrcDrivers
+.PHONY: clean-Src
 

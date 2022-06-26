@@ -45,7 +45,7 @@ typedef struct{
 #define SPI_SLAVE     0
 #define SPI_MASTER    1
 
-//SPI clock speed
+//SPI clock speed divider
 #define SPI_SPEED_2             	0
 #define SPI_SPEED_4             	1
 #define SPI_SPEED_8             	2
@@ -76,10 +76,22 @@ typedef struct{
 #define SPI_15BIT	14
 #define SPI_16BIT	15
 
+//Polarity
+#define SPI_CLK_IDLE_0	0
+#define SPI_CLK_IDLE_1	1
+
+//Phase
+#define SPI_CLK_CAPT_FIRST	0
+#define SPI_CLK_CAPT_SECOND	1
+
+//HW/SW slave management
+#define SPI_HW_MGMT	0
+#define SPI_SW_MGMT	1
+
 //Events for the callback, related to interrupts
-#define TX_FINISHED 0
-#define RX_FINISHED 1
-#define OVR_EVENT 	2
+#define SPI_TX_FINISHED 0
+#define SPI_RX_FINISHED 1
+#define SPI_OVR_EVENT 	2
 
 //state
 #define SPI_READY 		0
@@ -116,7 +128,7 @@ void SPI_IRQ_Handling(SPI_Handle_t *pSPIhandle);
 
 /*Send or receive data (through interrupts, not polling) */
 void SPI_Send(SPI_Handle_t *pSPIhandle, uint8_t *pTXbuffer, uint32_t length);
-void SPI_Read(SPI_Handle_t *pSPIhandle, uint8_t *pRXbuffer, uint32_t length);
+void SPI_Read(SPI_Handle_t *pSPIhandle, volatile uint8_t *pRXbuffer, uint32_t length);
 
 /*Callback to application */
 void SPI_App_Callback(SPI_Handle_t *pSPIhandle,uint8_t Event);
