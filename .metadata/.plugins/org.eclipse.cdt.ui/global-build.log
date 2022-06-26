@@ -1,28 +1,48 @@
-13:27:16 **** Incremental Build of configuration Debug for project Train_ButtonsLeds ****
-make -j4 all 
-arm-none-eabi-gcc "../myDrivers/SrcDrivers/gpio.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F0 -DSTM32F091RCTx -c -I../Inc -I"C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train_ButtonsLeds/myDrivers/IncDrivers" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"myDrivers/SrcDrivers/gpio.d" -MT"myDrivers/SrcDrivers/gpio.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "myDrivers/SrcDrivers/gpio.o"
-arm-none-eabi-gcc -o "Train_ButtonsLeds.elf" @"objects.list"   -mcpu=cortex-m0 -T"C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train_ButtonsLeds\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Train_ButtonsLeds.map" -Wl,--gc-sections -static -specs=rdimon.specs -lc -lrdimon --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: Train_ButtonsLeds.elf
+15:07:41 **** Clean-only build of configuration Debug_Semihosting for project Train ****
+make -j4 clean 
+rm -rf ./myDrivers/SrcDrivers/gpio.d ./myDrivers/SrcDrivers/gpio.o ./myDrivers/SrcDrivers/gpio.su ./myDrivers/SrcDrivers/spi.d ./myDrivers/SrcDrivers/spi.o ./myDrivers/SrcDrivers/spi.su
+rm -rf ./Startup/startup_stm32f091rctx.d ./Startup/startup_stm32f091rctx.o
+rm -rf ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/trainSPI_Arduino_debugSemihosting.d ./Src/trainSPI_Arduino_debugSemihosting.o ./Src/trainSPI_Arduino_debugSemihosting.su
+rm -rf Train.elf Train.list Train.map default.size.stdout
  
-arm-none-eabi-size   Train_ButtonsLeds.elf 
-arm-none-eabi-objdump -h -S  Train_ButtonsLeds.elf  > "Train_ButtonsLeds.list"
+15:07:42 **** Incremental Build of configuration Debug_Semihosting for project Train ****
+make -j4 all 
+arm-none-eabi-gcc "../myDrivers/SrcDrivers/gpio.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F0 -DSTM32F091RCTx -c -I../Inc -I"C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers" -O0 -ffunction-sections -fdata-sections -Wall -specs=rdimon.specs -lc -lrdimon -fstack-usage -MMD -MP -MF"myDrivers/SrcDrivers/gpio.d" -MT"myDrivers/SrcDrivers/gpio.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "myDrivers/SrcDrivers/gpio.o"
+arm-none-eabi-gcc "../myDrivers/SrcDrivers/spi.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F0 -DSTM32F091RCTx -c -I../Inc -I"C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers" -O0 -ffunction-sections -fdata-sections -Wall -specs=rdimon.specs -lc -lrdimon -fstack-usage -MMD -MP -MF"myDrivers/SrcDrivers/spi.d" -MT"myDrivers/SrcDrivers/spi.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "myDrivers/SrcDrivers/spi.o"
+arm-none-eabi-gcc -mcpu=cortex-m0 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"Startup/startup_stm32f091rctx.d" -MT"Startup/startup_stm32f091rctx.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Startup/startup_stm32f091rctx.o" "../Startup/startup_stm32f091rctx.s"
+arm-none-eabi-gcc "../Src/sysmem.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F0 -DSTM32F091RCTx -c -I../Inc -I"C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers" -O0 -ffunction-sections -fdata-sections -Wall -specs=rdimon.specs -lc -lrdimon -fstack-usage -MMD -MP -MF"Src/sysmem.d" -MT"Src/sysmem.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/sysmem.o"
+../myDrivers/SrcDrivers/spi.c: In function 'SPI_OVR_handler':
+../myDrivers/SrcDrivers/spi.c:245:12: warning: variable 'reading' set but not used [-Wunused-but-set-variable]
+  245 |   uint32_t reading; //maybe with uint8_t enough to read DR and SR?
+      |            ^~~~~~~
+../myDrivers/SrcDrivers/spi.c: In function 'SPI_Read':
+../myDrivers/SrcDrivers/spi.c:267:34: warning: assignment discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  267 |   pSPIhandle->SPI_Comm.RX_buffer = pRXbuffer;
+      |                                  ^
+../myDrivers/SrcDrivers/spi.c: In function 'SPI_ClearOVRFlag':
+../myDrivers/SrcDrivers/spi.c:280:11: warning: variable 'reading' set but not used [-Wunused-but-set-variable]
+  280 |  uint32_t reading;
+      |           ^~~~~~~
+arm-none-eabi-gcc "../Src/trainSPI_Arduino_debugSemihosting.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F0 -DSTM32F091RCTx -c -I../Inc -I"C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers" -O0 -ffunction-sections -fdata-sections -Wall -specs=rdimon.specs -lc -lrdimon -fstack-usage -MMD -MP -MF"Src/trainSPI_Arduino_debugSemihosting.d" -MT"Src/trainSPI_Arduino_debugSemihosting.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/trainSPI_Arduino_debugSemihosting.o"
+../Src/trainSPI_Arduino_debugSemihosting.c: In function 'flushDR':
+../Src/trainSPI_Arduino_debugSemihosting.c:332:33: warning: assignment discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  332 |  pSPIhandle->SPI_Comm.RX_buffer = rxbuffer;
+      |                                 ^
+arm-none-eabi-gcc -o "Train.elf" @"objects.list"   -mcpu=cortex-m0 -T"C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Train.map" -Wl,--gc-sections -static -specs=rdimon.specs -lc -lrdimon --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Train.elf
+ 
+arm-none-eabi-size   Train.elf 
+arm-none-eabi-objdump -h -S  Train.elf  > "Train.list"
    text	   data	    bss	    dec	    hex	filename
-   8844	    116	   1764	  10724	   29e4	Train_ButtonsLeds.elf
+  11152	    120	   1848	  13120	   3340	Train.elf
 Finished building: default.size.stdout
  
-Finished building: Train_ButtonsLeds.list
+Finished building: Train.list
  
-13:27:31 **** Incremental Build of configuration Debug for project Train_ButtonsLeds ****
+15:08:01 **** Incremental Build of configuration Debug_Semihosting for project Train ****
 make -j4 all 
-arm-none-eabi-size   Train_ButtonsLeds.elf 
+arm-none-eabi-size   Train.elf 
    text	   data	    bss	    dec	    hex	filename
-   8844	    116	   1764	  10724	   29e4	Train_ButtonsLeds.elf
-Finished building: default.size.stdout
- 
-13:32:18 **** Incremental Build of configuration Debug for project Train_ButtonsLeds ****
-make -j4 all 
-arm-none-eabi-size   Train_ButtonsLeds.elf 
-   text	   data	    bss	    dec	    hex	filename
-   8844	    116	   1764	  10724	   29e4	Train_ButtonsLeds.elf
+  11152	    120	   1848	  13120	   3340	Train.elf
 Finished building: default.size.stdout
  

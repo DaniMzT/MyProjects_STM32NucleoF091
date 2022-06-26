@@ -1,0 +1,283 @@
+/*
+ * spi.c
+ *
+ *  Created on: 2 jun. 2022
+ *      Author: danim
+ */
+
+#include "spi.h"
+
+/*Private functions, only accessed through spi.c. Basically the interrupt handlers */
+static void SPI_TXE_handler(SPI_Handle_t *pSPIhandle);
+static void SPI_RXNE_handler(SPI_Handle_t *pSPIhandle);
+static void SPI_OVR_handler(SPI_Handle_t *pSPIhandle);
+
+/*Enable or disable SPI peripheral clock*/
+void SPI_ClockControl(SPI_Handle_t *pSPIhandle, uint8_t EnableDisable){
+	if (EnableDisable == ENABLE) {
+		if (pSPIhandle->pSPI == SPI1_I2S1){
+			SPI1_I2S1_EnableClock();
+		}
+		else if (pSPIhandle->pSPI == SPI2){
+			SPI2_EnableClock();
+		}
+	}
+	else {
+		if (pSPIhandle->pSPI == SPI1_I2S1){
+			SPI1_I2S1_DisableClock();
+		}
+		else if (pSPIhandle->pSPI == SPI2){
+			SPI2_DisableClock();
+		}
+	}
+}
+
+/*SPI initialization, which does not mean to enable SPI (which is done through SPI_EnableDisable) */
+void SPI_Init(SPI_Handle_t *pSPIhandle){
+
+	SPI_ClockControl(pSPIhandle,ENABLE); //enable SPI peripheral clock
+	/*Configure CR1*/
+	//first,CR1 can be reset completely as it is not related to other parts (it might be reset with memset in the app,too)
+	pSPIhandle->pSPI->SPI_CR1 = 0;
+
+	//master/slave
+	pSPIhandle->pSPI->SPI_CR1 |= ((pSPIhandle->SPI_Config.SPI_Mode)<<SPI_CR1_MSTR); //bit MSTR set
+
+	//mode: full duplex/half duplex/simplex.Bits:BIDIMODE (full/half)+BIDIOE (output enabled)+RXONLY(1 if BIDIOE disabled)
+	if (pSPIhandle->SPI_Config.SPI_Mode == SPI_FULLDUPLEX){
+		pSPIhandle->pSPI->SPI_CR1 &= ~(1<<SPI_CR1_BIDIMODE); //not necessary to set 0 because SPI_CR1 had been initialized to 0,but makes code clearer
+	}
+	else if (pSPIhandle->SPI_Config.SPI_Mode == SPI_HALFDUPLEX){
+		pSPIhandle->pSPI->SPI_CR1 |= (1<<SPI_CR1_BIDIMODE);
+	}
+	else if (pSPIhandle->SPI_Config.SPI_Mode == SPI_CR1_RXONLY){
+		//acc to datasheet, Keep BIDIMODE bit clear when receive only mode is active.
+		pSPIhandle->pSPI->SPI_CR1 &= ~(1<<SPI_CR1_BIDIMODE);
+		pSPIhandle->pSPI->SPI_CR1 &= ~(1<<SPI_CR1_BIDIOE);
+		pSPIhandle->pSPI->SPI_CR1 |= (1<<SPI_CR1_RXONLY);
+	}
+	//simplex TX is actually full duplex
+
+	//Phase
+	pSPIhandle->pSPI->SPI_CR1 |= (pSPIhandle->SPI_Config.SPI_Phase<<SPI_CR1_CPHA);
+
+	//Polarity
+	pSPIhandle->pSPI->SPI_CR1 |= (pSPIhandle->SPI_Config.SPI_Pol<<SPI_CR1_CPOL);
+
+	//software slave management
+	pSPIhandle->pSPI->SPI_CR1 |= (pSPIhandle->SPI_Config.SPI_SWslave<<SPI_CR1_SSM);
+
+	//Speed (baudrate)
+	pSPIhandle->pSPI->SPI_CR1 |= (pSPIhandle->SPI_Config.SPI_Speed<<SPI_CR1_BR);
+
+	/*CR2. Not reset the whole CR2 to 0 as its bits can be modified from other parts of the code (enable interrupts)*/
+	//Size --> this is in CR2!! First reset the position (DS[0],bit8) and then set it
+	pSPIhandle->pSPI->SPI_CR2 &= (~(7<<SPI_CR2_DS));
+	pSPIhandle->pSPI->SPI_CR2 |= (pSPIhandle->SPI_Config.SPI_DataSize <<SPI_CR2_DS);
+}
+
+/*SPI control: enable/disable --> bit 6 CR1 */
+void SPI_EnableDisable(SPI_Handle_t *pSPIhandle, uint8_t EnableDisable){
+	//instead of reset and set bit 6, I prefer to directly set the value
+	if (EnableDisable == ENABLE){
+		pSPIhandle->pSPI->SPI_CR1 |= (1<<SPI_CR1_SPE);
+	}
+	else { //0
+		pSPIhandle->pSPI->SPI_CR1 &= (~(1<<SPI_CR1_SPE));
+	}
+}
+
+/*Reset SPI */
+void SPI_Reset(SPI_Handle_t *pSPIhandle){
+	if (pSPIhandle->pSPI == SPI1_I2S1){
+		SPI1_ResetClock();
+	}
+	else if (pSPIhandle->pSPI == SPI2){
+		SPI2_ResetClock();
+	}
+}
+
+/*SSI: internal slave select*/
+void SPI_SSI(SPI_Handle_t *pSPIhandle, uint8_t EnableDisable){
+	if (EnableDisable == ENABLE){
+		pSPIhandle->pSPI->SPI_CR1 |= (1<<SPI_CR1_SSI);
+	}
+	else { //0
+		pSPIhandle->pSPI->SPI_CR1 &= (~(1<<SPI_CR1_SSI));
+	}
+}
+
+/*SSOE: SS output enable*/
+void SPI_SSOE(SPI_Handle_t *pSPIhandle, uint8_t EnableDisable){
+	if (EnableDisable == ENABLE){
+		pSPIhandle->pSPI->SPI_CR2 |= (1<<SPI_CR2_SSOE);
+	}
+	else { //0
+		pSPIhandle->pSPI->SPI_CR2 &= (~(1<<SPI_CR2_SSOE));
+	}
+}
+
+/*Get flag. It could be useful but for interrupts (in handling) I guess it slows down the process,so probably I'm gonna do direct comparisons*/
+uint8_t SPI_GetFlagStatus(SPI_Handle_t *pSPIhandle , uint32_t Flag){
+	//Status register. Check bit position in stm..h
+	if (pSPIhandle->pSPI->SPI_SR & (1<<Flag)){ //if SPI_SR[flag pos] is 1, then that bit comparison ==1 so whole comparison !=0
+		return FLAG_SET;
+	}
+	else{
+		return FLAG_NOT_SET;
+	}
+
+}
+
+
+/*IRQ Configuration and ISR handling*/
+void SPI_IRQ_EnableDisable(uint8_t IRQ_Number, uint8_t EnableDisable){
+	if(EnableDisable == ENABLE){ //enable by means of ISER
+		*NVIC_ISER |= ( 1 << IRQ_Number);
+	}
+	else { //disable by means of ICER
+		*NVIC_ICER |= ( 1 << IRQ_Number);
+	}
+}
+
+void SPI_IRQ_Priority(uint8_t IRQ_Number, uint32_t IRQ_Priority){
+	//7 IPR registers, each one in 8-bits blocks for every IRQ. So 4 IRQ per IPR
+	/*Each priority field holds a priority value, 0-192. The lower the value, the greater the priority of the corresponding interrupt.
+	 * The processor implements only bits[7:6] of each field, bits [5:0] read as zero and ignore writes
+	 * Programmable priority level 0-192 in steps of 64 for each interrupt. level 0 is the highest interrupt priority.*/
+	if (IRQ_Priority>255) { //in order not to affect the next blocks
+		IRQ_Priority=255;
+	}
+	uint8_t numberIPR = IRQ_Number / 4;
+	uint8_t blockIPR = IRQ_Number % 4;
+	//Clear the block and set. Better if I use intermediate variables instead of modifying many times the IPR
+	uint32_t tempIPR = ((*(NVIC_IPR_BASE + numberIPR))&~(0xFF<<blockIPR));
+	tempIPR |= (IRQ_Priority<<(8*blockIPR+6)); //6 is because bits 0-5 are not editable, only bits 6-7 count.
+	*(NVIC_IPR_BASE + numberIPR) = tempIPR;
+}
+
+void SPI_IRQ_Handling(SPI_Handle_t *pSPIhandle){
+	//to handle the possible interrupts related to SPI:TXE,RXNE,MODF,OVR,FRE,CRCERR
+	//Call the handler related to the interrupt if register is true as long as it is enabled
+	//TXE TX empty (enable control:TXEIE).if set, TX buffer empty so it can be loaded.
+	if ( (pSPIhandle->pSPI->SPI_CR2 & (1<<SPI_CR2_TXEIE)) && (pSPIhandle->pSPI->SPI_SR & (1<<SPI_SR_TXE)) ){ //could use SPI_GetFlagStatus
+		SPI_TXE_handler(pSPIhandle);
+	}
+
+	//RXNE RX not empty (enable control:RXNEIE). if set, RX not empty so it has data to be read.
+	if ( (pSPIhandle->pSPI->SPI_CR2 & (1<<SPI_CR2_RXNEIE)) && (pSPIhandle->pSPI->SPI_SR & (1<<SPI_SR_RXNE)) ){ //could use SPI_GetFlagStatus
+		SPI_RXNE_handler(pSPIhandle);
+	}
+
+	/*MODF. Master mode fault event. In a master SPI, the MODF bit is set whenever the SS pin goes low (and SSOE=0,multimaster). In a slave SPI, the
+	MODF bit is set when the SS pin goes high during transmission.*/
+	//To be implemented if someday I use multimaster
+
+	/*OVR. Overrun. (enable control:ERRIE)occurs when data is received by a master or slave and the RXFIFO has not enough space to store
+	 this received data.*/
+	if ( (pSPIhandle->pSPI->SPI_CR2 & (1<<SPI_CR2_ERRIE)) && (pSPIhandle->pSPI->SPI_SR & (1<<SPI_SR_OVR)) ){ //could use SPI_GetFlagStatus
+		SPI_OVR_handler(pSPIhandle);
+	}
+
+	//FRE. TI frame format error.
+	//To be implemented when I use TI mode (it seems that TI and Motorola modes are related to SSPFSSOUT output, which many devices don't use).
+
+	//CRCERR
+	//To be implemented
+}
+
+/*interrupt handlers*/
+static void SPI_TXE_handler(SPI_Handle_t *pSPIhandle){
+	/*When transmission is enabled, a sequence begins and continues while any data is present in the TXFIFO of the master.*/
+	//Let's limit it to 8 and 16 bits frame. Every char is 1 byte
+	//Load the data into DR, move the pointer (buffer) and decrease length
+	if (pSPIhandle->SPI_Config.SPI_DataSize == SPI_8BIT){
+		pSPIhandle->pSPI->SPI_DR = *(pSPIhandle->SPI_Comm.TX_buffer);
+		pSPIhandle->SPI_Comm.TX_buffer++;
+		pSPIhandle->SPI_Comm.TX_length--;
+	}
+	else if (pSPIhandle->SPI_Config.SPI_DataSize == SPI_16BIT){
+		//TX_buffer is defined as 8-bit.additional treatment is necessary
+		pSPIhandle->pSPI->SPI_DR = *((uint16_t*)(pSPIhandle->SPI_Comm.TX_buffer));
+		pSPIhandle->SPI_Comm.TX_buffer+=2;
+		pSPIhandle->SPI_Comm.TX_length-=2;
+	}
+	//(I don't use else because DS allows more lengths)
+
+	//Close transmission when no more bytes in the buffer
+	if (pSPIhandle->SPI_Comm.TX_length == 0){
+		pSPIhandle->pSPI->SPI_CR2 &= (~( 1 << SPI_CR2_TXEIE)); //disable the TX interrupt.It will be enabled by SPI_Send in the next sending
+		pSPIhandle->SPI_Comm.TX_buffer = NULL; //null pointer
+		pSPIhandle->SPI_Comm.TX_state = SPI_READY; //important for loops in main!
+		SPI_App_Callback(pSPIhandle,SPI_TX_FINISHED); //Inform the main application
+	}
+}
+
+static void SPI_RXNE_handler(SPI_Handle_t *pSPIhandle){
+	//Let's limit it to 8 and 16 bits frame. Every char is 1 byte
+	//Load the data into DR, move the pointer (buffer) and decrease length
+	if (pSPIhandle->SPI_Config.SPI_DataSize == SPI_8BIT){
+		*(pSPIhandle->SPI_Comm.RX_buffer) = ((uint8_t*)pSPIhandle->pSPI->SPI_DR) ;
+		pSPIhandle->SPI_Comm.RX_buffer++;
+		pSPIhandle->SPI_Comm.RX_length--;
+	}
+	else if (pSPIhandle->SPI_Config.SPI_DataSize == SPI_16BIT){
+		//RX_buffer is defined as 8-bit.additional treatment is necessary
+		*(pSPIhandle->SPI_Comm.RX_buffer) = ((uint16_t*)pSPIhandle->pSPI->SPI_DR) ;
+		pSPIhandle->SPI_Comm.RX_buffer+=2;
+		pSPIhandle->SPI_Comm.RX_length-=2;
+	}
+	//(I don't use else because DS allows more lengths)
+
+	//Close reception when no more bytes in the buffer
+	if (pSPIhandle->SPI_Comm.RX_length == 0){
+		pSPIhandle->pSPI->SPI_CR2 &= (~( 1 << SPI_CR2_RXNEIE)); //disable the RX interrupt.It will be enabled by SPI_Receive in the next sending
+		pSPIhandle->SPI_Comm.RX_buffer = NULL; //null pointer
+		pSPIhandle->SPI_Comm.RX_state = SPI_READY; //important for loops in main!
+		SPI_App_Callback(pSPIhandle,SPI_RX_FINISHED); //Inform the main application
+	}
+}
+
+static void SPI_OVR_handler(SPI_Handle_t *pSPIhandle){
+	//Clearing OVR bit is done by a read access to the SPI_DR register followed by a read access to the SPI_SR register
+	//if the error happens during transmission,as this error is related to RXFIFO,we won't clear it here. If so, the app will do it
+	if (pSPIhandle->SPI_Comm.TX_state != SPI_DURING_TX){ //clear
+		uint32_t reading; //maybe with uint8_t enough to read DR and SR?
+		reading = pSPIhandle->pSPI->SPI_DR;
+		reading = pSPIhandle->pSPI->SPI_SR;
+	}
+	//inform the main application
+	SPI_App_Callback(pSPIhandle,SPI_OVR_EVENT);
+}
+
+/*Send or read data (through interrupts, not polling). Master always starts communication */
+void SPI_Send(SPI_Handle_t *pSPIhandle, uint8_t *pTXbuffer, uint32_t length){
+	//set TX state as busy (SPI_DURING_TX) and configure the transmission
+	if (pSPIhandle->SPI_Comm.TX_state != SPI_DURING_TX){
+		pSPIhandle->SPI_Comm.TX_state = SPI_DURING_TX;
+		pSPIhandle->SPI_Comm.TX_buffer = pTXbuffer;
+		pSPIhandle->SPI_Comm.TX_length = length;
+		pSPIhandle->pSPI->SPI_CR2 |= (1 << SPI_CR2_TXEIE);//enable the TX interrupt to start transmission
+	}
+}
+void SPI_Read(SPI_Handle_t *pSPIhandle, uint8_t *pRXbuffer, uint32_t length){
+	//set RX state as busy (SPI_DURING_RX) and configure the reading process (DR fetches from RX buffer).
+	if (pSPIhandle->SPI_Comm.RX_state != SPI_DURING_RX){
+		pSPIhandle->SPI_Comm.RX_state = SPI_DURING_RX;
+		pSPIhandle->SPI_Comm.RX_buffer = pRXbuffer;
+		pSPIhandle->SPI_Comm.RX_length = length;
+		pSPIhandle->pSPI->SPI_CR2 |= (1 << SPI_CR2_RXNEIE);//enable the RX interrupt to start reception
+	}
+}
+
+/*Callback to application */
+__attribute__((weak)) void SPI_App_Callback(SPI_Handle_t *pSPIhandle,uint8_t Event){
+	//This function will be implemented in every particular application. Thus, the weak attribute
+}
+
+/*Clear OVR (overrun) flag.Already done in SPI_OVR_handler if TX_state not busy */
+void SPI_ClearOVRFlag(SPI_Handle_t *pSPIhandle){
+	uint32_t reading;
+	reading = pSPIhandle->pSPI->SPI_DR;
+	reading = pSPIhandle->pSPI->SPI_SR;
+}

@@ -1,0 +1,10 @@
+15:08:01 **** Incremental Build of configuration Debug_Semihosting for project Train ****
+make -j4 all 
+arm-none-eabi-size   Train.elf 
+   text	   data	    bss	    dec	    hex	filename
+  11152	    120	   1848	  13120	   3340	Train.elf
+Finished building: default.size.stdout
+ 
+
+15:08:01 Build Finished. 0 errors, 0 warnings. (took 325ms)
+
