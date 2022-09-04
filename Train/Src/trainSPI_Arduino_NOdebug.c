@@ -64,6 +64,9 @@ uint8_t myTXbuffer[2]; //2 will be maximum size. we could try with dynamic array
 uint8_t myRXbuffer[2]; //we could use one single buffer for both TX and RX if we had scarce memory
 uint8_t dummy_byte = 0xC1; //dummy byte for SPI
 
+enum stateSPI{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,SEND_STATE,READ_STATE,WAIT_END};
+enum stateSPI flagSPI = SEND_PRINT;
+
 int stringLength(char *charSt){ //to know the length of a string instead of using external functions
 	int length = 0;
 	char *pointer = charSt; //to avoid modifying charSt
@@ -82,6 +85,9 @@ void delay(void)
 
 //Configurations and initializations
 void peripheral_Config_Ini(void);
+
+//flush DR
+void flushDR(SPI_Handle_t *pSPIhandle, volatile uint8_t *rxbuffer, uint8_t length);
 /**********************************************START MAIN********************************************************************/
 int main(void)
 {
@@ -113,70 +119,105 @@ int main(void)
 	while (1){
 		//if state changes, send print command and the content. Think about a way to do it with interrupt due to value change
 		if (stateChanged) {
-			//enable SPI and disable it at the end?
+			//switch-case instead of while (TX/RXstate != READ) to avoid blocking
+			switch (flagSPI){ //{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,SEND_STATE,READ_STATE}
+			case SEND_PRINT:
+				//enable SPI and disable it at the end?
 
-			//Send print command.Ard should store it in its RX buffer and put ACK in TX.Master should receive garbage in shift reg.
-			myTXbuffer[0] = SPI_COMMAND_PRINT;
-			SPI_Send(&spi1, &myTXbuffer[0], 1);
-			//SPI_Send(&spi1, (uint8_t*)SPI_COMMAND_PRINT, 1);
-			while (spi1.SPI_Comm.TX_state != SPI_READY);
-			delay();
+				//Reading data register to flush previous data (previously it had been working without this)
+				//NOT IMPLEMENTED;IF NECESSARY,COPY FROM debugSemihosting: flushDR(&spi1, myRXbuffer, 1);
 
-			//Read master RX to clear it off for the next reading
-			SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
-			while (spi1.SPI_Comm.RX_state != SPI_READY);
-			delay();
+				//Send print command.Ard should store it in its RX buffer and put ACK in TX.Master should receive garbage in shift reg.
+				myTXbuffer[0] = SPI_COMMAND_PRINT;
+				SPI_Send(&spi1, &myTXbuffer[0], 1); //SPI_Send(&spi1, (uint8_t*)SPI_COMMAND_PRINT, 1);
+				flagSPI = READ_PRINT;
+				break;
 
-			//Send dummy data to Ard so that master receives ACK/NACK
-			SPI_Send(&spi1, &dummy_byte, 1); //length 1 byte
-			while (spi1.SPI_Comm.TX_state != SPI_READY);
-			delay();
+			case READ_PRINT://Read master RX to clear the RX buffer for the next reading of ACK
+				if (spi1.SPI_Comm.TX_state == SPI_READY){
+					delay();
+					SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
+					flagSPI = DUMMY_ACK;
+				}
+				break;
 
-			//Read master RX to get ACK/NACK
-			SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
-			while (spi1.SPI_Comm.RX_state != SPI_READY);
-			//printf("myRXbuffer ACK: %s/n", myRXbuffer);
-			delay();
+			case DUMMY_ACK://Send dummy data to Ard so that master receives ACK/NACK
+				if (spi1.SPI_Comm.RX_state == SPI_READY){
+					delay();
+					SPI_Send(&spi1, &dummy_byte, 1); //length 1 byte
+					flagSPI = READ_ACK;
+				}
+				break;
 
-			//if ACK, send length+currentState and receive response
-			if (*myRXbuffer == SPI_ARD_ACK){
-				//myTXbuffer[0] = 8; //in bits
-				myTXbuffer[0] = 0x01; //in bytes
-				myTXbuffer[1] = currentState;
-				//SPI_Send(&spi1, myTXbuffer, 2); //length is 2
-				//method 2: 1 byte by byte
-				SPI_Send(&spi1, myTXbuffer, 1);
-				while (spi1.SPI_Comm.TX_state != SPI_READY);
-				delay();
-				myTXbuffer[0] = currentState; //in bytes
-				SPI_Send(&spi1, myTXbuffer, 1);
-				while (spi1.SPI_Comm.TX_state != SPI_READY);
-				delay();
+			case READ_ACK://Read master RX to get ACK/NACK
+				if (spi1.SPI_Comm.TX_state == SPI_READY){
+					delay();
+					SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
+					flagSPI = SEND_LENGTH;
+				}
+				break;
 
-				SPI_Read(&spi1, myRXbuffer, 2); //2 bytes to be read (dummy read).
-				while (spi1.SPI_Comm.RX_state != SPI_READY);
-				//printf("myRXbuffer after sending state: %s/n", myRXbuffer);
+			case SEND_LENGTH://if ACK, send length+currentState and receive response;otherwise,send it again
+				if (spi1.SPI_Comm.RX_state == SPI_READY){
+					delay();
+					if (*myRXbuffer == SPI_ARD_ACK){
+						//myTXbuffer[0] = 8; //in bits
+						myTXbuffer[0] = 0x01; //in bytes
+						myTXbuffer[1] = currentState;
+						//SPI_Send(&spi1, myTXbuffer, 2); //length is 2
+						//method 2: 1 byte by byte
+						SPI_Send(&spi1, myTXbuffer, 1);
+						flagSPI = READ_LENGTH;
+					}
+					else {
+						//try to send it again
+						flagSPI = SEND_PRINT;
+					}
+				}
+				break;
 
-				//myTXbuffer = "statusChanged: ";
-				//printf("status changed to: %d/n",currentState);
-				delay();
+			case READ_LENGTH://Read master RX
+				if (spi1.SPI_Comm.TX_state == SPI_READY){
+					delay();
+					SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
+					flagSPI = SEND_STATE;
+				}
+				break;
+
+			case SEND_STATE: //send the state
+				if (spi1.SPI_Comm.RX_state == SPI_READY){
+					delay();
+					myTXbuffer[0] = currentState; //in bytes
+					SPI_Send(&spi1, myTXbuffer, 1);
+					flagSPI = READ_STATE;
+				}
+				break;
+
+			case READ_STATE: //read RXNE to clear it off to avoid overrun
+				if (spi1.SPI_Comm.TX_state == SPI_READY){
+					delay();
+					SPI_Read(&spi1, myRXbuffer, 2); //2 bytes to be read (dummy read).
+					flagSPI = WAIT_END;
+				}
+				break;
+
+			case WAIT_END:
+				if (spi1.SPI_Comm.RX_state == SPI_READY){
+					delay();
+					//clear the flag of current state in order to capture state changes
+					stateChanged = 0;
+
+					//Disable SPI?
+
+					//get ready for the next state change
+					flagSPI = SEND_PRINT;
+				}
+				break;
+			default:
+				//error. print it in semihosting
+				break;
+
 			}
-			else{
-				//printf("no ACK received/n");
-				//just for testing
-				/*myTXbuffer[0] = 8; //in bits
-				myTXbuffer[1] = currentState;
-				SPI_Send(&spi1, myTXbuffer, 2); //length is 2
-				while (spi1.SPI_Comm.TX_state != SPI_READY);
-
-				SPI_Read(&spi1, myRXbuffer, 2); //2 bytes to be read (dummy read).
-				while (spi1.SPI_Comm.RX_state != SPI_READY);*/
-			}
-
-			//clear the flag of current state in order to capture state changes
-			stateChanged = 0;
-
-			//Disable SPI?
 		}
 
 	}
@@ -226,6 +267,13 @@ void SPI1_IRQHandler(void){
 	SPI_IRQ_Handling(&spi1);
 }
 
+
+/*callback,declared in spi.h,called from tx/rx handlers when finished
+ * I use it just for debugging to avoid reading registers from debugger (if read,SR modified)
+ */
+/*void SPI_App_Callback(SPI_Handle_t *pSPIhandle,uint8_t Event){
+	//NOT NECESSARY SO FAR BECAUSE I'M USING if WITH RX/TX STATE == READY (it's volatile)
+}*/
 /**********************************************END IRQ********************************************************************/
 
 /*****************************Configurations and initializations************************************************************/

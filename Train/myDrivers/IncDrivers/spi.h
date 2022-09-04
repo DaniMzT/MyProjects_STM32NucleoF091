@@ -89,9 +89,9 @@ typedef struct{
 #define SPI_SW_MGMT	1
 
 //Events for the callback, related to interrupts
-#define SPI_TX_FINISHED 0
-#define SPI_RX_FINISHED 1
-#define SPI_OVR_EVENT 	2
+#define SPI_TX_FINISHED 1
+#define SPI_RX_FINISHED 2
+#define SPI_OVR_EVENT 	3
 
 //state
 #define SPI_READY 		0

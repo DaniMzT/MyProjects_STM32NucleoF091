@@ -60,9 +60,8 @@ uint8_t stateChanged = 0; //0 if the state changes; 1 if it changes
 #define SPI_ARD_ACK		0xA1
 #define SPI_ARD_NACK	0xB1
 
-uint8_t myTXbuffer[2] = {0,0}; //2 will be maximum size. we could try with dynamic arrays based on int*
-volatile uint8_t myRXbuffer[2] = {0,0};//volatile because it is modified by an ISR
-//we could use one single buffer for both TX and RX if we had scarce memory
+uint8_t myTXbuffer[2]; //2 will be maximum size. we could try with dynamic arrays based on int*
+uint8_t myRXbuffer[2]; //we could use one single buffer for both TX and RX if we had scarce memory
 uint8_t dummy_byte = 0xC1; //dummy byte for SPI
 uint8_t printedRX[2] = {0,0}; //used to print myRXbuffer
 
@@ -79,7 +78,7 @@ int stringLength(char *charSt){ //to know the length of a string instead of usin
 void delay(void)
 {
 	// some delay for the debouncing of the buttons
-	for(uint32_t i = 0 ; i < 300000/2 ; i ++);
+	for(uint32_t i = 0 ; i < 1000000/2 ; i ++);//300000/2 working in old PC. in new PC, so far 1000000/2 mostly
 }
 
 //Configurations and initializations
@@ -125,40 +124,54 @@ int main(void)
 
 			//Send print command.Ard should store it in its RX buffer and put ACK in TX.Master should receive garbage in shift reg.
 			myTXbuffer[0] = SPI_COMMAND_PRINT;
-			SPI_Send(&spi1, myTXbuffer, 1);
+			SPI_Send(&spi1, &myTXbuffer[0], 1);
 			//SPI_Send(&spi1, (uint8_t*)SPI_COMMAND_PRINT, 1);
 			while (spi1.SPI_Comm.TX_state != SPI_READY);
 			printf("Command print sent\n");
+			delay();
 
 			//Read master RX to clear it off for the next reading
 			SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
 			while (spi1.SPI_Comm.RX_state != SPI_READY);
+			delay();
 			printf("Read what was in Ard\n");
 
 			//Send dummy data to Ard so that master receives ACK/NACK
 			SPI_Send(&spi1, &dummy_byte, 1); //length 1 byte
 			while (spi1.SPI_Comm.TX_state != SPI_READY);
 			printf("Dummy byte sent to get ACK\n");
+			delay();
 
 			//Read master RX to get ACK/NACK
 			SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
 			while (spi1.SPI_Comm.RX_state != SPI_READY);
 			printf("should read ACK\n");
+			delay();
 
 			//if ACK, send length+currentState and receive response
 			if (*myRXbuffer == SPI_ARD_ACK){
-				myTXbuffer[0] = 8; //in bits
+				//myTXbuffer[0] = 8; //in bits
+				myTXbuffer[0] = 0x01; //in bytes
 				myTXbuffer[1] = currentState;
-				SPI_Send(&spi1, myTXbuffer, 2); //length is 2
+				//SPI_Send(&spi1, myTXbuffer, 2); //length is 2
+				//method 2: 1 byte by byte
+				SPI_Send(&spi1, myTXbuffer, 1);
+				while (spi1.SPI_Comm.TX_state != SPI_READY);
+				delay();
+				myTXbuffer[0] = currentState; //in bytes
+				SPI_Send(&spi1, myTXbuffer, 1);
 				while (spi1.SPI_Comm.TX_state != SPI_READY);
 				printf("Sent length+currentState\n");
+				delay();
 
 				SPI_Read(&spi1, myRXbuffer, 2); //2 bytes to be read (dummy read).
 				while (spi1.SPI_Comm.RX_state != SPI_READY);
-				printf("dummy read due to length+curState sent: %s/n", myRXbuffer);
+				//printf("myRXbuffer after sending state: %s/n", myRXbuffer);
 
 				//myTXbuffer = "statusChanged: ";
+				//printf("status changed to: %d/n",currentState);
 				printf("status changed to: %d/n",currentState);
+				delay();
 			}
 			else{
 				printf("no ACK received\n");
@@ -278,15 +291,16 @@ void peripheral_Config_Ini(void){
 	//SCK
 	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_SCK;//SCK
 	GPIO_PinInit(&spiGPIOs);
+
+	spiGPIOs.GPIO_PinConfig.GPIO_PinPullUpDown = GPIO_PULLUP;
+	//NSS
+	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_NSS;//NSS
+	GPIO_PinInit(&spiGPIOs);
 	//MISO
 	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_MISO;//MISO
 	GPIO_PinInit(&spiGPIOs);
 	//MOSI
 	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_MOSI;//MOSI
-	GPIO_PinInit(&spiGPIOs);
-	//NSS
-	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_NSS;//NSS
-	spiGPIOs.GPIO_PinConfig.GPIO_PinPullUpDown = GPIO_PULLUP;
 	GPIO_PinInit(&spiGPIOs);
 
 	/*SPI handle configuration and initialization*/
@@ -324,6 +338,9 @@ void SPI_App_Callback(SPI_Handle_t *pSPIhandle,uint8_t Event){
 		}
 	}
 }
+/**********************************END IRQ*******************************************************************/
+
+/***************************************OTHERS**************************************************/
 
 /*Flush DR by reading it*/
 void flushDR(SPI_Handle_t *pSPIhandle, volatile uint8_t *rxbuffer, uint8_t length){
