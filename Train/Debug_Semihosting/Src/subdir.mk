@@ -6,15 +6,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Src/sysmem.c \
-../Src/trainSPI_Arduino_debugSemihosting.c 
+../Src/trainSPI_Arduino_NOdebug.c 
 
 OBJS += \
 ./Src/sysmem.o \
-./Src/trainSPI_Arduino_debugSemihosting.o 
+./Src/trainSPI_Arduino_NOdebug.o 
 
 C_DEPS += \
 ./Src/sysmem.d \
-./Src/trainSPI_Arduino_debugSemihosting.d 
+./Src/trainSPI_Arduino_NOdebug.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -24,7 +24,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/trainSPI_Arduino_debugSemihosting.d ./Src/trainSPI_Arduino_debugSemihosting.o ./Src/trainSPI_Arduino_debugSemihosting.su
+	-$(RM) ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/trainSPI_Arduino_NOdebug.d ./Src/trainSPI_Arduino_NOdebug.o ./Src/trainSPI_Arduino_NOdebug.su
 
 .PHONY: clean-Src
 

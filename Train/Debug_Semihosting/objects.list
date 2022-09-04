@@ -1,5 +1,5 @@
 "./Src/sysmem.o"
-"./Src/trainSPI_Arduino_debugSemihosting.o"
+"./Src/trainSPI_Arduino_NOdebug.o"
 "./Startup/startup_stm32f091rctx.o"
 "./myDrivers/SrcDrivers/gpio.o"
 "./myDrivers/SrcDrivers/spi.o"

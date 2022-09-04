@@ -71,9 +71,14 @@ void SPI_Init(SPI_Handle_t *pSPIhandle){
 	pSPIhandle->pSPI->SPI_CR1 |= (pSPIhandle->SPI_Config.SPI_Speed<<SPI_CR1_BR);
 
 	/*CR2. Not reset the whole CR2 to 0 as its bits can be modified from other parts of the code (enable interrupts)*/
-	//Size --> this is in CR2!! First reset the position (DS[0],bit8) and then set it
-	pSPIhandle->pSPI->SPI_CR2 &= (~(7<<SPI_CR2_DS));
+	//Size --> this is in CR2!! First reset the data size (bits8-11) and then set it
+	pSPIhandle->pSPI->SPI_CR2 &= (~(15<<SPI_CR2_DS)); //I had put pSPIhandle->pSPI->SPI_CR2 &= (~(7<<SPI_CR2_DS)). Why 7?
 	pSPIhandle->pSPI->SPI_CR2 |= (pSPIhandle->SPI_Config.SPI_DataSize <<SPI_CR2_DS);
+
+	//to avoid data packing, set FIFO threshold reception to 1/4 (8-bit). Read data packing section
+	if (pSPIhandle->SPI_Config.SPI_DataSize == SPI_8BIT){
+		pSPIhandle->pSPI->SPI_CR2 |= (1<<SPI_CR2_FRXTH);
+	}
 }
 
 /*SPI control: enable/disable --> bit 6 CR1 */
@@ -192,7 +197,9 @@ static void SPI_TXE_handler(SPI_Handle_t *pSPIhandle){
 	//Let's limit it to 8 and 16 bits frame. Every char is 1 byte
 	//Load the data into DR, move the pointer (buffer) and decrease length
 	if (pSPIhandle->SPI_Config.SPI_DataSize == SPI_8BIT){
-		pSPIhandle->pSPI->SPI_DR = *(pSPIhandle->SPI_Comm.TX_buffer);
+		/*this sends 2 bytes <--pSPIhandle->pSPI->SPI_DR = *(pSPIhandle->SPI_Comm.TX_buffer);*/
+		//data packing happens. it transmits 16-bit unless we cast into uint8_t
+		*((uint8_t*)&pSPIhandle->pSPI->SPI_DR) = *(pSPIhandle->SPI_Comm.TX_buffer);
 		pSPIhandle->SPI_Comm.TX_buffer++;
 		pSPIhandle->SPI_Comm.TX_length--;
 	}

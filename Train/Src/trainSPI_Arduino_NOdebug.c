@@ -77,7 +77,7 @@ int stringLength(char *charSt){ //to know the length of a string instead of usin
 void delay(void)
 {
 	// some delay for the debouncing of the buttons
-	for(uint32_t i = 0 ; i < 300000/2 ; i ++);
+	for(uint32_t i = 0 ; i < 1000000/2 ; i ++);//300000/2 working in old PC. in new PC, so far 1000000/2 mostly
 }
 
 //Configurations and initializations
@@ -117,29 +117,41 @@ int main(void)
 
 			//Send print command.Ard should store it in its RX buffer and put ACK in TX.Master should receive garbage in shift reg.
 			myTXbuffer[0] = SPI_COMMAND_PRINT;
-			SPI_Send(&spi1, myTXbuffer, 1);
+			SPI_Send(&spi1, &myTXbuffer[0], 1);
 			//SPI_Send(&spi1, (uint8_t*)SPI_COMMAND_PRINT, 1);
 			while (spi1.SPI_Comm.TX_state != SPI_READY);
+			delay();
 
 			//Read master RX to clear it off for the next reading
 			SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
 			while (spi1.SPI_Comm.RX_state != SPI_READY);
+			delay();
 
 			//Send dummy data to Ard so that master receives ACK/NACK
 			SPI_Send(&spi1, &dummy_byte, 1); //length 1 byte
 			while (spi1.SPI_Comm.TX_state != SPI_READY);
+			delay();
 
 			//Read master RX to get ACK/NACK
 			SPI_Read(&spi1, myRXbuffer, 1); //1 byte to be read
 			while (spi1.SPI_Comm.RX_state != SPI_READY);
 			//printf("myRXbuffer ACK: %s/n", myRXbuffer);
+			delay();
 
 			//if ACK, send length+currentState and receive response
 			if (*myRXbuffer == SPI_ARD_ACK){
-				myTXbuffer[0] = 8; //in bits
+				//myTXbuffer[0] = 8; //in bits
+				myTXbuffer[0] = 0x01; //in bytes
 				myTXbuffer[1] = currentState;
-				SPI_Send(&spi1, myTXbuffer, 2); //length is 2
+				//SPI_Send(&spi1, myTXbuffer, 2); //length is 2
+				//method 2: 1 byte by byte
+				SPI_Send(&spi1, myTXbuffer, 1);
 				while (spi1.SPI_Comm.TX_state != SPI_READY);
+				delay();
+				myTXbuffer[0] = currentState; //in bytes
+				SPI_Send(&spi1, myTXbuffer, 1);
+				while (spi1.SPI_Comm.TX_state != SPI_READY);
+				delay();
 
 				SPI_Read(&spi1, myRXbuffer, 2); //2 bytes to be read (dummy read).
 				while (spi1.SPI_Comm.RX_state != SPI_READY);
@@ -147,9 +159,18 @@ int main(void)
 
 				//myTXbuffer = "statusChanged: ";
 				//printf("status changed to: %d/n",currentState);
+				delay();
 			}
 			else{
 				//printf("no ACK received/n");
+				//just for testing
+				/*myTXbuffer[0] = 8; //in bits
+				myTXbuffer[1] = currentState;
+				SPI_Send(&spi1, myTXbuffer, 2); //length is 2
+				while (spi1.SPI_Comm.TX_state != SPI_READY);
+
+				SPI_Read(&spi1, myRXbuffer, 2); //2 bytes to be read (dummy read).
+				while (spi1.SPI_Comm.RX_state != SPI_READY);*/
 			}
 
 			//clear the flag of current state in order to capture state changes
@@ -263,11 +284,13 @@ void peripheral_Config_Ini(void){
 	spiGPIOs.GPIO_PinConfig.GPIO_PinOutType = GPIO_PUSHPULL;
 	spiGPIOs.GPIO_PinConfig.GPIO_PinOutSpeed = GPIO_HIGHSPEED; //FAST SPEED
 	spiGPIOs.GPIO_PinConfig.GPIO_PinPullUpDown = GPIO_NOPULL;
-	//NSS
-	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_NSS;//NSS
-	GPIO_PinInit(&spiGPIOs);
 	//SCK
 	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_SCK;//SCK
+	GPIO_PinInit(&spiGPIOs);
+
+	spiGPIOs.GPIO_PinConfig.GPIO_PinPullUpDown = GPIO_PULLUP;
+	//NSS
+	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_NSS;//NSS
 	GPIO_PinInit(&spiGPIOs);
 	//MISO
 	spiGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_SPI1_MISO;//MISO

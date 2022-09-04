@@ -60,8 +60,8 @@ all: main-build
 main-build: Train.elf secondary-outputs
 
 # Tool invocations
-Train.elf Train.map: $(OBJS) $(USER_OBJS) C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train\STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Train.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\danim\STM32CubeIDE\workspace_1.9.0\Train\STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Train.map" -Wl,--gc-sections -static -specs=rdimon.specs -lc -lrdimon --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Train.elf Train.map: $(OBJS) $(USER_OBJS) /home/danimt/Documents/embedded_projects/train/Train_STM32/STM32F091RCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Train.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"/home/danimt/Documents/embedded_projects/train/Train_STM32/STM32F091RCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Train.map" -Wl,--gc-sections -static -specs=rdimon.specs -lc -lrdimon --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

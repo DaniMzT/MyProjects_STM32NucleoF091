@@ -1,9 +1,9 @@
 myDrivers/SrcDrivers/spi.o: ../myDrivers/SrcDrivers/spi.c \
- C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/spi.h \
- C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/stm32f091rct6.h \
- C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/gpio.h \
- C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/spi.h
-C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/spi.h:
-C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/stm32f091rct6.h:
-C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/gpio.h:
-C:/Users/danim/STM32CubeIDE/workspace_1.9.0/Train/myDrivers/IncDrivers/spi.h:
+ /home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/spi.h \
+ /home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/stm32f091rct6.h \
+ /home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/gpio.h \
+ /home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/spi.h
+/home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/spi.h:
+/home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/stm32f091rct6.h:
+/home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/gpio.h:
+/home/danimt/Documents/embedded_projects/train/Train_STM32/myDrivers/IncDrivers/spi.h:
