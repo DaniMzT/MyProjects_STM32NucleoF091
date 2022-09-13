@@ -1,0 +1,4 @@
+SPI:
+- optimize STM (minimize delay() ) and Arduino (remove prints)
+- update semihosting with no-blocking code
+- figure out why Arduino reads wrong bytes from MOSI eventually (logical analyzer evidences MOSI is ok as expected)
