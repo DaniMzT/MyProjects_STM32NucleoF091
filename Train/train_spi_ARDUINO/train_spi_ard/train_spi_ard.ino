@@ -129,11 +129,16 @@ void setup()
 }
 
 
-byte checkData(byte commnad)
+byte checkCommandPrint(byte inputcommand)
 {
   Serial.println("in checkData");
   //todo
-  return ACK;
+  if (inputcommand == SPI_COMMAND_PRINT){
+    return ACK;
+  }
+  else {
+    return NACK;
+  }
 }
 
 // The loop function runs continuously after setup().
@@ -153,7 +158,7 @@ void loop()
   //2. now lets wait until rx buffer has a byte
   Serial.println("1.Received command");
   command = SPI_SlaveReceive();
-  ackornack = checkData(command);
+  ackornack = checkCommandPrint(command);
   
   Serial.println("2.command to be transmitted when dummy");
   SPI_SlaveTransmit(ackornack);
@@ -165,11 +170,11 @@ void loop()
   {
     Serial.println("4.Received length");
     //uint8_t len = SPI_SlaveReceive(); 
-    len = SPI_SlaveReceive(); //dummy byte from STM32 so that ACK/NACK is sent
+    len = SPI_SlaveReceive(); 
     for(i=0 ; i < len ; i++)
     {
       Serial.print(i);
-      Serial.println(" byte received");
+      Serial.println(" byte position received:");
       dataBuff[i] = SPI_SlaveReceive();
     }
     /*Serial.print("length:");
