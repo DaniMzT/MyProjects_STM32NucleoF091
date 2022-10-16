@@ -24,7 +24,7 @@ typedef struct{
 
 /*structure used during communication (basically during interrupts) */
 typedef struct{
-	uint32_t TX_length; //length buffer TX in bits. Every char is 1 byte
+	uint32_t TX_length; //length buffer TX in bytes. Every char is 1 byte
 	uint8_t *TX_buffer; //not the buffer register, but a variable where we put our data to be sent to DR
 	uint8_t TX_state;
 	uint32_t RX_length;
@@ -96,7 +96,7 @@ typedef struct{
 //state
 #define SPI_READY 		0
 #define SPI_DURING_TX	1
-#define SPI_DURING_RX	1
+#define SPI_DURING_RX	2
 
 /*********************************************APIs************************************************************/
 

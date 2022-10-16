@@ -2,3 +2,5 @@ SPI:
 - optimize STM (minimize delay() ) and Arduino (remove prints)
 - update semihosting with no-blocking code
 - figure out why Arduino reads wrong bytes from MOSI eventually (logical analyzer evidences MOSI is ok as expected)
+- rename main programs to moduleSPI (same for first module when testing GPIOs). 
+- create a copy and modify it so that Arduino sends temperature information, instead of STM sending status (anyway, STM master)
