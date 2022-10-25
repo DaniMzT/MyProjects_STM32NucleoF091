@@ -434,6 +434,10 @@ typedef struct
 //Bit position definitions I2C_TXDR
 #define I2C_TXDR_TXDATA		 		0 //[7:0]
 
+//Adress mode
+#define I2C_ADDRESS_MODE_7BIT		0
+#define I2C_ADDRESS_MODE_10BIT		1
+
 /*************INCLUDE DRIVER HEADERS************/
 #include "gpio.h"
 #include "spi.h"

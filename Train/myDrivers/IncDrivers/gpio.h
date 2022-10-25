@@ -51,6 +51,15 @@ typedef struct{
 #define GPIO_PULLDOWN 		2
 #define GPIO_RESERVEDPULL	3
 
+//Alternate functions
+#define GPIO_AF0	0
+#define GPIO_AF1	1
+#define GPIO_AF2	2
+#define GPIO_AF3	3
+#define GPIO_AF4	4
+#define GPIO_AF5	5
+#define GPIO_AF6	6
+#define GPIO_AF7	7
 /*********************************Prototypes of APIs (functions) defined in gpio.c***********************************/
 /*Enable or disable GPIO port peripheral clock*/
 void GPIO_ClockControl(GPIO_RegStruct_t *pGPIO, uint8_t EnableDisable);

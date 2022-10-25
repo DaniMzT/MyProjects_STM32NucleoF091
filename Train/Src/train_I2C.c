@@ -27,10 +27,11 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+/*PORTS USED:PA0,1,9,10(LEDs);PB3,5(BUTTONS);PA4-7(SPI);PB6,9(I2C)
 /*2 buttons causing interruptions: OnOff(PB3) and Emergency(PB5). 4 LEDs */
 
 //GPIO_PinHandle_t butOnOff, butEmerg, led0, led1, led2, led3;
-GPIO_PinHandle_t buttons, leds,spiGPIOs;
+GPIO_PinHandle_t buttons, leds, spiGPIOs, i2cGPIOs;
 #define PIN_LED0 0
 #define PIN_LED1 1
 #define PIN_LED2 9 //PA2 TX? it seems not to work when debugging
@@ -44,6 +45,11 @@ SPI_Handle_t spi1;
 #define PIN_SPI1_SCK 5
 #define PIN_SPI1_MISO 6
 #define PIN_SPI1_MOSI 7
+
+/*I2C handle*/
+I2C_Handle_t i2c1;
+#define PIN_I2C1_SCL 6
+#define PIN_I2C1_SDA 9
 
 enum state{OFF,ON,EMERGENCY};
 enum state currentState = OFF;
@@ -66,6 +72,10 @@ uint8_t stateChanged = 0; //0 if the state changes; 1 if it changes
 uint8_t myTXbuffer;
 uint8_t myRXbuffer;
 uint8_t dummy_byte = 0xC1; //dummy byte for SPI
+
+//I2C related
+uint32_t lastTemperature = 0;
+uint8_t restart = 1; //flag to enable/disable restart. Based on callback from I2C
 
 enum stateSPI{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,SEND_STATE,READ_STATE,WAIT_END};
 enum stateSPI flagSPI = SEND_PRINT;
@@ -102,10 +112,13 @@ int main(void)
 	memset(&buttons,0,sizeof(buttons));
 	memset(&leds,0,sizeof(leds));
 
-	/*GPIOs for the SPI handled by spiGPIO -->SPI1 PA4:NSS PA4:SCK PA4:MISO PA4:MOSI*/
-	GPIO_PinHandle_t spiGPIOs;
+	/*GPIOs for the SPI handled by spiGPIO -->SPI1 PA4:NSS PA4:SCK PA4:MISO PA4:MOSI. sp1 is the handle for SPI1*/
 	memset(&spiGPIOs,0,sizeof(spiGPIOs));
 	memset(&spi1,0,sizeof(spi1));
+
+	/*GPIOs for the I2C handled by i2cGPIOs. i2c1 is the handle for I2C1*/
+	memset(&i2cGPIOs,0,sizeof(i2cGPIOs));
+	memset(&i2c1,0,sizeof(i2c1));
 
 	//Configurations and initilizations
 	peripheral_Config_Ini();
@@ -117,11 +130,13 @@ int main(void)
 	GPIO_IRQ_EnableDisable(IRQ_EXTI4_15, ENABLE);
 	//SPI1
 	SPI_IRQ_EnableDisable(IRQ_SPI1, ENABLE);
+	//I2C1
+	I2C_IRQ_EnableDisable(IRQ_I2C1, ENABLE);
 
 	/* Loop forever */
 	while (1){
 		//if state changes, send print command and the content. Think about a way to do it with interrupt due to value change
-		if (stateChanged) {
+		/*if (stateChanged) {
 			//switch-case instead of while (TX/RXstate != READ) to avoid blocking
 			switch (flagSPI){ //{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,SEND_STATE,READ_STATE}
 			case SEND_PRINT:
@@ -217,6 +232,10 @@ int main(void)
 				break;
 
 			}
+		}*/
+		if (restart){
+			i2c1->I2C_Comm_t.RX_length = 1;
+			I2C_Master_Receiver(&i2c1, 1, 0);
 		}
 
 	}
@@ -273,12 +292,31 @@ void SPI1_IRQHandler(void){
 /*void SPI_App_Callback(SPI_Handle_t *pSPIhandle,uint8_t Event){
 	//NOT NECESSARY SO FAR BECAUSE I'M USING if WITH RX/TX STATE == READY (it's volatile)
 }*/
+
+//I2C
+//I2C1 IRQ handler, from startup_stm32f091rctx.s
+void I2C1_IRQHandler(void){
+	I2C_IRQ_Handling(&i2c1);
+}
+//callback
+void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
+	if (event == I2C_NEW_READING){ //new value from the external ADC (temperature sensor)
+		lastTemperature = pI2Chandle->I2C_Comm_t.RX_buffer;
+	}
+	if (event == I2C_RESTART_STOP){
+		restart = 1;
+	}
+	else {
+		restart = 0;
+	}
+}
 /**********************************************END IRQ********************************************************************/
 
 /*****************************Configurations and initializations************************************************************/
 void peripheral_Config_Ini(void){
 
-	//LED0
+	/**********************LEDS***********************************************/
+	//LED0. PA0
 	leds.pGPIO = GPIOA;
 	leds.GPIO_PinConfig.GPIO_PinNumber = PIN_LED0;
 	leds.GPIO_PinConfig.GPIO_PinMode = GPIO_OUT;
@@ -288,17 +326,17 @@ void peripheral_Config_Ini(void){
 	//Initialization LED0
 	GPIO_PinInit(&leds);
 
-	//LED1.Port,Mode,OutType,OutSpeed and PullUpDown same as LED0
+	//LED1.PA1.Port,Mode,OutType,OutSpeed and PullUpDown same as LED0
 	leds.GPIO_PinConfig.GPIO_PinNumber = PIN_LED1;
 	//Initialization LED1
 	GPIO_PinInit(&leds);
 
-	//LED2.Port,Mode,OutType,OutSpeed and PullUpDown same as LED0
+	//LED2.PA9.Port,Mode,OutType,OutSpeed and PullUpDown same as LED0
 	leds.GPIO_PinConfig.GPIO_PinNumber = PIN_LED2;
 	//Initialization LED2
 	GPIO_PinInit(&leds);
 
-	//LED3.Port,Mode,OutType,OutSpeed and PullUpDown same as LED0
+	//LED3.PA10.Port,Mode,OutType,OutSpeed and PullUpDown same as LED0
 	leds.GPIO_PinConfig.GPIO_PinNumber = PIN_LED3;
 	//Initialization LED3
 	GPIO_PinInit(&leds);
@@ -309,7 +347,8 @@ void peripheral_Config_Ini(void){
 	GPIO_WritePin(GPIOA,PIN_LED2,0);
 	GPIO_WritePin(GPIOA,PIN_LED3,1);
 
-	//BUTTON ON-OFF
+	/***************************************BUTTONS********************************/
+	//BUTTON ON-OFF. PB3
 	buttons.pGPIO = GPIOB;
 	buttons.GPIO_PinConfig.GPIO_PinNumber = PIN_BUTTON_OFFON;
 	buttons.GPIO_PinConfig.GPIO_PinMode = GPIO_FALL_TRIG; //interrupt falling edge
@@ -317,7 +356,7 @@ void peripheral_Config_Ini(void){
 	//initialization button on-off
 	GPIO_PinInit(&buttons);
 
-	//EMERGENCY BUTTON
+	//EMERGENCY BUTTON. PB5
 	buttons.pGPIO = GPIOB;
 	buttons.GPIO_PinConfig.GPIO_PinNumber = PIN_BUTTON_EMERGENCY;
 	buttons.GPIO_PinConfig.GPIO_PinMode = GPIO_FALL_TRIG;
@@ -325,9 +364,11 @@ void peripheral_Config_Ini(void){
 	//initialization emergency button
 	GPIO_PinInit(&buttons);
 
-	//GPIOs for SPI: SPI1 PA4:NSS PA5:SCK PA6:MISO PA7:MOSI
+	/**************************************SPI***********************************/
+	//GPIOs for SPI: SPI1 PA4:NSS PA5:SCK PA6:MISO PA7:MOSI. Alternate function AF0
 	spiGPIOs.pGPIO = GPIOA;
 	spiGPIOs.GPIO_PinConfig.GPIO_PinMode = GPIO_ALTFUN;
+	spiGPIOs.GPIO_PinConfig.GPIO_PinAlterFunc = GPIO_AF0;
 	spiGPIOs.GPIO_PinConfig.GPIO_PinOutType = GPIO_PUSHPULL;
 	spiGPIOs.GPIO_PinConfig.GPIO_PinOutSpeed = GPIO_HIGHSPEED; //FAST SPEED
 	spiGPIOs.GPIO_PinConfig.GPIO_PinPullUpDown = GPIO_NOPULL;
@@ -365,5 +406,32 @@ void peripheral_Config_Ini(void){
 
 	//Enable SPI peripheral
 	SPI_EnableDisable(&spi1,ENABLE);
+
+	/**********************************I2C*****************************************/
+	//GPIOs for I2C: PB6(SCL), PB9(SDA).Alternate function AF1!
+	i2cGPIOs.pGPIO = GPIOB;
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinMode = GPIO_ALTFUN;
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinAlterFunc = GPIO_AF1;
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinOutType = GPIO_PUSHPULL;
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinOutSpeed = GPIO_HIGHSPEED; //FAST SPEED
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinPullUpDown = GPIO_PULLUP; //internal pull up
+	//SCL
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_I2C1_SCL;//SCL
+	GPIO_PinInit(&i2cGPIOs);
+	//SDA
+	i2cGPIOs.GPIO_PinConfig.GPIO_PinNumber = PIN_I2C1_SDA;//SDA
+	GPIO_PinInit(&i2cGPIOs);
+
+	//I2C configuration
+	i2c1.pI2C = I2C1;
+	i2c1->I2C_Config.I2C_AddressMode = I2C_ADDRESS_MODE_7BIT;
+	i2c1->I2C_Comm_t.I2C_SlaveAddress = 0x48;
+	i2c1->I2C_Comm_t.I2C_Nbytes = 1;
+	i2c1->I2C_Comm_t.RX_length = 1;
+	i2c1->I2C_Comm_t.I2C_RepeatStart = 1;
+
+	//I2C initialization
+	I2C_Init(&i2c1);
+
 }
 

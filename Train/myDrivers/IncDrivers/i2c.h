@@ -14,8 +14,8 @@
 /*structure to configure I2C, which will be linked to the registers(SPI_RegStruct_t in stm32f091rct6.h) in the driver functions*/
 typedef struct{
 	uint8_t I2C_Mode; //master/slave
-	uint8_t I2C_Speed; //clock speed
 	uint8_t I2C_AddressMode; //0: 7-bit; 1: 10-bit
+	uint32_t I2C_Timing; //clock configuration (TIMINGR register)
 }I2C_Config_t;
 
 /*structure used during communication (basically during interrupts) */
@@ -27,7 +27,7 @@ typedef struct{
 	uint8_t communication_state; //TX and RX included here
 	uint8_t I2C_RepeatStart; //related to Autoend. for master mode (=1 automatic stop after nbytes transferred; if restart,=0)
 	uint8_t I2C_Nbytes; //number of bytes to be transmitted/received
-	uint8_t I2C_SlaveAddress;
+	uint16_t I2C_SlaveAddress; //7-bit or 10-bit
 }I2C_Comm_t;
 
 /*structure to handle I2C: configuration struct + pointer to registers(I2C_RegStruct_t in stm32..h) + communication struct*/
@@ -76,8 +76,8 @@ void I2C_IRQ_EnableDisable(uint8_t IRQ_Number, uint8_t EnableDisable); //IRQ_I2C
 void I2C_IRQ_Priority(uint8_t IRQ_Number, uint32_t IRQ_Priority);
 void I2C_IRQ_Handling(I2C_Handle_t *pI2Chandle);
 
-void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, bool autoend);
-void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, bool autoend);
+void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend);
+void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend);
 void I2C_Master_Manual_Stop(I2C_Handle_t *pI2Chandle); //sends STOP when autoend=0.called in main program
 //to be done: same but in case of STM32 being slave
 

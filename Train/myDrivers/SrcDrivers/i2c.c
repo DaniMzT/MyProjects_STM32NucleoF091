@@ -15,6 +15,8 @@ static void I2C_STOP_handler(I2C_Handle_t *pI2Chandle);
 static void I2C_TC_handler(I2C_Handle_t *pI2Chandle);
 static void I2C_TCR_handler(I2C_Handle_t *pI2Chandle); //when NBYTES>255
 
+static void I2C_SlaveAddress(I2C_Handle_t *pI2Chandle); //set slave address
+
 /*Enable or disable I2C peripheral clock*/
 void I2C_ClockControl(I2C_Handle_t *pI2Chandle, uint8_t EnableDisable){
 	if (EnableDisable == ENABLE) {
@@ -35,12 +37,21 @@ void I2C_ClockControl(I2C_Handle_t *pI2Chandle, uint8_t EnableDisable){
 	}
 }
 
-/*Initialization*/
+/*Initialization, which enables clock but not the peripheral yet(this is done by I2C_EnableDisable)*/
 void I2C_Init(I2C_Handle_t *pI2Chandle){
+	//enable I2C peripheral clock
+	I2C_ClockControl(pI2Chandle,ENABLE);
+
 	/*The timings must be configured in order to guarantee correct data hold and setup times,
 	*used in master and slave modes. This is done by programming the PRESC[3:0],
 	*SCLDEL[3:0] and SDADEL[3:0] bits in the I2C_TIMINGR register.
 	*/
+	/*Configure TIMINGR. Use I2C_Timing_Config_Tool_Vx.y.z.xls or check out values in 26.4.11
+	 * I2C_TIMINGR register configuration examples.
+	 * This includes clock speed, I2C mode (standard,fast...)
+	 */
+	pI2Chandle->pI2C->I2C_TIMINGR = (uint32_t)pI2Chandle->I2C_Config.I2C_Timing;
+
 	/*//TX buffer as a dynamic array
 	pI2Chandle->I2C_Comm_t.TX_buffer = malloc(pI2Chandle->I2C_Comm_t.TX_length);*/
 }
@@ -49,6 +60,7 @@ void I2C_Init(I2C_Handle_t *pI2Chandle){
 void I2C_EnableDisable(I2C_Handle_t *pI2Chandle, uint8_t EnableDisable){
 	if (EnableDisable == ENABLE){
 		pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_PE);
+		pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
 	}
 	else { //0
 		pI2Chandle->pI2C->I2C_CR1 &= (~(1<<I2C_CR1_PE));
@@ -115,11 +127,24 @@ void I2C_IRQ_Handling(I2C_Handle_t *pI2Chandle){
 	}
 }
 
-void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, bool autoend){
+static void I2C_SlaveAddress(I2C_Handle_t *pI2Chandle){
+	//slave address (7-bit or 10-bit)
+	if (pI2Chandle->I2C_Config.I2C_AddressMode == I2C_ADDRESS_MODE_7BIT){ //7-bit
+		//mask to 7 bits and set
+		pI2Chandle->pI2C->I2C_CR2 |= (pI2Chandle->I2C_Comm_t.I2C_SlaveAddress & 0x7F);
+	}
+	else { //10-bit
+		//mask to 10 bits and set
+		pI2Chandle->pI2C->I2C_CR2 |= (pI2Chandle->I2C_Comm_t.I2C_SlaveAddress & 0x3FF);
+	}
+}
+
+void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend){
 	//TX state busy + configure transmission(including interrupts) + start&address
 	if (pI2Chandle->I2C_Comm_t.communication_state != (I2C_DURING_TX || I2C_DURING_RX)){
 		//start transmission (start+slave address) if I2C_READY,I2C_RESTART_STOP or I2C_RELOAD
-		//configuration
+		//slave address (7-bit or 10-bit)
+		I2C_SlaveAddress(pI2Chandle);
 		//enable TXIE,necessary for TXIS
 		pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_TXIE);
 		//write NBYTES --> this would clear TCR by the way
@@ -164,11 +189,12 @@ void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, bool au
 
 }
 
-void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, bool autoend){
+void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend){
 	//RX state busy + configure reception(including interrupts) + start&address
 	if (pI2Chandle->I2C_Comm_t.communication_state != (I2C_DURING_TX || I2C_DURING_RX)){
 		//start transmission (start+slave address) if I2C_READY,I2C_RESTART_STOP or I2C_RELOAD
-		//configuration
+		//slave address (7-bit or 10-bit)
+		I2C_SlaveAddress(pI2Chandle);
 		//enable RXIE,necessary for RXNE
 		pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_RXIE);
 		//write NBYTES --> this would clear TCR by the way
