@@ -319,8 +319,8 @@ typedef struct
 } I2C_RegStruct_t;
 
 //pointer
-#define I2C1						((SPI_RegStruct_t*)I2C1_BASE)
-#define I2C2						((SPI_RegStruct_t*)I2C2_BASE)
+#define I2C1						((I2C_RegStruct_t*)I2C1_BASE)
+#define I2C2						((I2C_RegStruct_t*)I2C2_BASE)
 
 //enable I2C peripheral clock
 #define I2C1_EnableClock()			((RCC->APB1ENR)|=(1<<21))
@@ -328,7 +328,7 @@ typedef struct
 
 //disable I2C peripheral clock
 #define I2C1_DisableClock()			((RCC->APB1ENR)&=(~(1<<21)))
-#define I2C1_DisableClock()			((RCC->APB1ENR)&=(~(1<<22)))
+#define I2C2_DisableClock()			((RCC->APB1ENR)&=(~(1<<22)))
 
 //Reset I2C peripheral clock
 #define I2C1_ResetClock()			((RCC->APB1RSTR)|=(1<<21))

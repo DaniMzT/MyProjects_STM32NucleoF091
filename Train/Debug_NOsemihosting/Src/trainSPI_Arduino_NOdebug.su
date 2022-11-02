@@ -1,7 +1,0 @@
-../Src/trainSPI_Arduino_NOdebug.c:73:5:stringLength	24	static
-../Src/trainSPI_Arduino_NOdebug.c:83:6:delay	16	static
-../Src/trainSPI_Arduino_NOdebug.c:95:5:main	24	static
-../Src/trainSPI_Arduino_NOdebug.c:227:6:EXTI2_3_IRQHandler	8	static
-../Src/trainSPI_Arduino_NOdebug.c:249:6:EXTI4_15_IRQHandler	8	static
-../Src/trainSPI_Arduino_NOdebug.c:265:6:SPI1_IRQHandler	8	static
-../Src/trainSPI_Arduino_NOdebug.c:279:6:peripheral_Config_Ini	8	static

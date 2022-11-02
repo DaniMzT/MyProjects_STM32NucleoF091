@@ -1,5 +1,6 @@
 "./Src/sysmem.o"
-"./Src/trainSPI_Arduino_NOdebug.o"
+"./Src/train_I2C.o"
 "./Startup/startup_stm32f091rctx.o"
 "./myDrivers/SrcDrivers/gpio.o"
+"./myDrivers/SrcDrivers/i2c.o"
 "./myDrivers/SrcDrivers/spi.o"

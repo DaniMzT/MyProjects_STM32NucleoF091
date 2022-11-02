@@ -38,7 +38,7 @@ typedef struct{
 }I2C_Handle_t;
 
 /************************************************Macros*******************************************************/
-//Events for the callback, related to interrupts
+//Events for the callback, information to be used in main
 #define I2C_TX_STARTED  0
 #define I2C_RX_STARTED 	1
 #define I2C_FINISHED 	2
@@ -47,7 +47,7 @@ typedef struct{
 #define I2C_TC			5
 #define I2C_TCR			6
 
-//state
+//I2C state used in i2c.c handle
 #define I2C_READY 			0
 #define I2C_DURING_TX		1
 #define I2C_DURING_RX		2

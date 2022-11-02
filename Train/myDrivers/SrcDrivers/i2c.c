@@ -50,7 +50,7 @@ void I2C_Init(I2C_Handle_t *pI2Chandle){
 	 * I2C_TIMINGR register configuration examples.
 	 * This includes clock speed, I2C mode (standard,fast...)
 	 */
-	pI2Chandle->pI2C->I2C_TIMINGR = (uint32_t)pI2Chandle->I2C_Config.I2C_Timing;
+	pI2Chandle->pI2C->I2C_TIMINGR = pI2Chandle->I2C_Config.I2C_Timing;
 
 	/*//TX buffer as a dynamic array
 	pI2Chandle->I2C_Comm_t.TX_buffer = malloc(pI2Chandle->I2C_Comm_t.TX_length);*/
@@ -148,13 +148,15 @@ void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t
 		//enable TXIE,necessary for TXIS
 		pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_TXIE);
 		//write NBYTES --> this would clear TCR by the way
-		pI2Chandle->I2C_Comm_t.I2C_Nbytes = bytes;
+		pI2Chandle->I2C_Comm_t.I2C_Nbytes = exp_bytes;
 		//if exp_bytes > 255 --> RELOAD = 1, enable TCR
 		if (pI2Chandle->I2C_Comm_t.I2C_Nbytes > 255){ //RELOAD mode (AUTOEND does not apply)
+			pI2Chandle->I2C_Comm_t.TX_length = 255;
 			pI2Chandle->pI2C->I2C_CR2 |= (1<<I2C_CR2_RELOAD);
 			pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_TCIE); //TCIE is for both TC and TCR
 		}
 		else{
+			pI2Chandle->I2C_Comm_t.TX_length = exp_bytes;
 			pI2Chandle->pI2C->I2C_CR2 &= !((1<<I2C_CR2_RELOAD)); //disable RELOAD
 			/*AUTOEND
 			 *0: software end mode: TC flag is set when NBYTES data are transferred, stretching SCL low.
@@ -162,11 +164,11 @@ void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t
 			 *transferred.
 			 *Note: This bit has no effect in slave mode or when the RELOAD bit is set.
 			 */
-			if (!autoend){ //software end mode
+			if (autoend){ //automatic end mode
 				pI2Chandle->pI2C->I2C_CR2 |= (1<<I2C_CR2_AUTOEND);
 				pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_TCIE); //to enable TC (TCIE is for both TC and TCR)
 			}
-			else{ //automatic end mode
+			else{ //software end mode
 				pI2Chandle->pI2C->I2C_CR2 &= !((1<<I2C_CR2_AUTOEND));
 				pI2Chandle->pI2C->I2C_CR1 &= !((1<<I2C_CR1_TCIE)); //to disable TC
 			}
@@ -198,13 +200,15 @@ void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t au
 		//enable RXIE,necessary for RXNE
 		pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_RXIE);
 		//write NBYTES --> this would clear TCR by the way
-		pI2Chandle->I2C_Comm_t.I2C_Nbytes = bytes;
+		pI2Chandle->I2C_Comm_t.I2C_Nbytes = exp_bytes;
 		//if exp_bytes > 255 --> RELOAD = 1, enable TCR
 		if (pI2Chandle->I2C_Comm_t.I2C_Nbytes > 255){ //RELOAD mode (AUTOEND does not apply)
+			pI2Chandle->I2C_Comm_t.RX_length = 255;
 			pI2Chandle->pI2C->I2C_CR2 |= (1<<I2C_CR2_RELOAD);
 			pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_TCIE); //TCIE is for both TC and TCR
 		}
 		else{
+			pI2Chandle->I2C_Comm_t.RX_length = exp_bytes;
 			pI2Chandle->pI2C->I2C_CR2 &= !((1<<I2C_CR2_RELOAD)); //disable RELOAD
 			/*AUTOEND
 			 *0: software end mode: TC flag is set when NBYTES data are transferred, stretching SCL low.
@@ -212,11 +216,11 @@ void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t au
 			 *transferred.
 			 *Note: This bit has no effect in slave mode or when the RELOAD bit is set.
 			 */
-			if (!autoend){ //software end mode
+			if (autoend){ //automatic end mode
 				pI2Chandle->pI2C->I2C_CR2 |= (1<<I2C_CR2_AUTOEND);
 				pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_TCIE); //to enable TC (TCIE is for both TC and TCR)
 			}
-			else{ //automatic end mode
+			else{ //software end mode
 				pI2Chandle->pI2C->I2C_CR2 &= !((1<<I2C_CR2_AUTOEND));
 				pI2Chandle->pI2C->I2C_CR1 &= !((1<<I2C_CR1_TCIE)); //to disable TC
 			}
@@ -301,8 +305,8 @@ static void I2C_STOP_handler(I2C_Handle_t *pI2Chandle){
 	//if I2C_WAITING_END --> I2C_READY. Close transmission/reception,buffer pointing to NULL
 	if (pI2Chandle->I2C_Comm_t.communication_state == I2C_WAITING_END){
 		pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
-		pSPIhandle->SPI_Comm.RX_buffer = NULL; //null pointer
-		pSPIhandle->SPI_Comm.TX_buffer = NULL; //null pointer
+		pI2Chandle->I2C_Comm_t.RX_buffer = NULL; //null pointer
+		pI2Chandle->I2C_Comm_t.TX_buffer = NULL; //null pointer
 		pI2Chandle->pI2C->I2C_ICR |= (1<<I2C_ICR_STOPCF);
 		I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
 		I2C_App_Callback(pI2Chandle, I2C_FINISHED);
@@ -331,6 +335,6 @@ static void I2C_TCR_handler(I2C_Handle_t *pI2Chandle){ //when NBYTES>255
 }
 
 /*Callback to application */
-__attribute__((weak)) I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
+__attribute__((weak)) void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
 	//This function will be implemented in every particular application. Thus, the weak attribute
 }
