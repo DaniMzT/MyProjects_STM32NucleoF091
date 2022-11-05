@@ -38,7 +38,7 @@ typedef struct{
 }I2C_Handle_t;
 
 /************************************************Macros*******************************************************/
-//Events for the callback, information to be used in main
+//Events for the callback, information to be used in main (callback)
 #define I2C_TX_STARTED  0
 #define I2C_RX_STARTED 	1
 #define I2C_FINISHED 	2
@@ -83,5 +83,8 @@ void I2C_Master_Manual_Stop(I2C_Handle_t *pI2Chandle); //sends STOP when autoend
 
 /*Callback to application */
 void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event);
+
+/*TIMINGR calculation*/
+void I2C_Master_TimingR(I2C_Handle_t *pI2Chandle, uint8_t presc, uint8_t scldel, uint8_t sdadel, uint8_t sclh, uint8_t scll);
 
 #endif /* INCDRIVERS_I2C_H_ */
