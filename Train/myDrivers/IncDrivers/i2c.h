@@ -55,6 +55,10 @@ typedef struct{
 #define I2C_RESTART_STOP	4 //after TC, SCL streched low waiting for restart or stop/
 #define I2C_RELOAD			5 //after TCR, waiting for reloading NBYTES (total>255)
 
+//I2C automatic end or manual
+#define I2C_AUTOEND				0
+#define I2C_REPEAT_START		1
+
 /*********************************************APIs************************************************************/
 //start+address+read/write, stop, transmission, ack/nack
 //others to be considered in a future: reload, APIs for 10-bit addresses, slave APIs...

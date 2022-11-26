@@ -248,6 +248,7 @@ int main(void)
 			restart = 0;
 			configureADS1115(&i2c1);
 			if (flagADS1115 == ADS1115_CONFIGURED){
+				I2C_EnableDisable(&i2c1,ENABLE);
 				I2C_Master_Receiver(&i2c1, ADS1115_CONVERSION_REGISTER_BYTES, 1);//1st byte read(MSB of Conversion register)+2nd byte read(LSB)
 			}
 		}
@@ -321,7 +322,7 @@ void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
 			firstByteRead = byteRead;
 		}
 	}
-	if (Event == I2C_RESTART_STOP || Event == I2C_FINISHED){
+	if ((Event == I2C_RESTART_STOP) || (Event == I2C_FINISHED)){
 		//if ADS1115 not configured yet,focus on that:
 		if (flagADS1115 != ADS1115_CONFIGURED){
 			switch (flagADS1115){
@@ -330,6 +331,9 @@ void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
 				break;
 			case ADS1115_2ND_DURING:
 				flagADS1115 = ADS1115_CONFIGURED;
+				break;
+
+			default:
 				break;
 			}
 		}
@@ -471,7 +475,7 @@ void peripheral_Config_Ini(void){
 	i2c1.I2C_Comm_t.I2C_SlaveAddress = ADS1115_ADDRESS; //ADS1115 address
 	i2c1.I2C_Comm_t.I2C_Nbytes = 1;
 	i2c1.I2C_Comm_t.RX_length = 1;
-	i2c1.I2C_Comm_t.I2C_RepeatStart = 1;
+	i2c1.I2C_Comm_t.I2C_RepeatStart = I2C_AUTOEND;
 
 	//I2C initialization
 	I2C_Init(&i2c1);
@@ -482,7 +486,7 @@ void peripheral_Config_Ini(void){
 /*********************************CONFIGURE ADS1115**********************************************/
 void configureADS1115(I2C_Handle_t *pI2Chandle){
 	//https://cdn-shop.adafruit.com/datasheets/ads1115.pdf
-	if (flagADS1115 < ADS1115_1ST_DONE){
+	if (flagADS1115 < ADS1115_1ST_DURING){
 		//continuous mode
 		//1-write to config reg. bit 8 mode(0:continuous;1:single-shot,default);bits 9-11:gain amplifier.bit 15 set to 1 starts single shot (in single-shot mode)
 		//transmiter:address+0x01(points to config reg)+0b10000100(MSB:start shot+default gain+continuous)+0b10000011(LSB:default rate+no comparator)
@@ -491,6 +495,7 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 		bytes_to_ADS1115_reg[2] = 0x83; //0b10000011 (LSB)
 		pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
 		flagADS1115 = ADS1115_1ST_DURING;
+		I2C_EnableDisable(&i2c1,ENABLE);
 		I2C_Master_Transmitter(pI2Chandle, 3, 1);
 	}
 
@@ -501,6 +506,7 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 		bytes_to_ADS1115_reg[0] = 0x00; //0x00(points to conversion register)
 		pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
 		flagADS1115 = ADS1115_2ND_DURING;
+		I2C_EnableDisable(&i2c1,ENABLE);
 		I2C_Master_Transmitter(pI2Chandle, 1, 1);
 	}
 
