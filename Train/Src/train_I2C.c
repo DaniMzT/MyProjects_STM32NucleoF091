@@ -80,10 +80,10 @@ enum stateSPI flagSPI = SEND_PRINT;
 //I2C related
 uint8_t byteRead = 0;
 uint8_t firstByteRead = 0;
-uint8_t boolFirstByteRead = 0; //boolean to know if first byte from ADS1115 has already been read
 uint8_t restart = 1; //flag to enable/disable restart. Based on callback from I2C
 uint16_t lastADS1115_raw = 0;
 uint8_t bytes_to_ADS1115_reg[3] = {0x00,0x00,0x00}; //for ADS1115 configuration (it can require 3 bytes)
+uint8_t bytes_from_ADS1115[2] = {0x00,0x00}; //data received from ADS1115 (conversion register)
 enum stateADS1115{ADS1115_NOT_STARTED,ADS1115_1ST_DURING,ADS1115_1ST_DONE,ADS1115_2ND_DURING,ADS1115_CONFIGURED};
 enum stateADS1115 flagADS1115 = ADS1115_NOT_STARTED;
 
@@ -97,10 +97,10 @@ int stringLength(char *charSt){ //to know the length of a string instead of usin
 	return length;
 }
 
-void delay(void)
+void delay(uint32_t timeDelayed)
 {
 	// some delay for the debouncing of the buttons
-	for(uint32_t i = 0 ; i < 1000000/2 ; i ++);//300000/2 working in old PC. in new PC, so far 1000000/2 mostly
+	for(uint32_t i = 0 ; i < timeDelayed ; i ++);//SPI,GPIO too?: 300000/2 working in old PC. in new PC, so far 1000000/2 mostly
 }
 
 //Configurations and initializations
@@ -164,7 +164,7 @@ int main(void)
 
 			case READ_PRINT://Read master RX to clear the RX buffer for the next reading of ACK
 				if (spi1.SPI_Comm.TX_state == SPI_READY){
-					delay();
+					delay(500000);
 					SPI_Read(&spi1, &myRXbuffer, 1); //1 byte to be read
 					flagSPI = DUMMY_ACK;
 				}
@@ -172,7 +172,7 @@ int main(void)
 
 			case DUMMY_ACK://Send dummy data to Ard so that master receives ACK/NACK
 				if (spi1.SPI_Comm.RX_state == SPI_READY){
-					delay();
+					delay(500000);
 					SPI_Send(&spi1, &dummy_byte, 1); //length 1 byte
 					flagSPI = READ_ACK;
 				}
@@ -180,7 +180,7 @@ int main(void)
 
 			case READ_ACK://Read master RX to get ACK/NACK
 				if (spi1.SPI_Comm.TX_state == SPI_READY){
-					delay();
+					delay(500000);
 					SPI_Read(&spi1, &myRXbuffer, 1); //1 byte to be read
 					flagSPI = SEND_LENGTH;
 				}
@@ -188,7 +188,7 @@ int main(void)
 
 			case SEND_LENGTH://if ACK, send length+currentState and receive response;otherwise,send it again
 				if (spi1.SPI_Comm.RX_state == SPI_READY){
-					delay();
+					delay(500000);
 					if (myRXbuffer == SPI_ARD_ACK){
 						myTXbuffer = 0x01; //in bytes
 						SPI_Send(&spi1, &myTXbuffer, 1);
@@ -203,7 +203,7 @@ int main(void)
 
 			case READ_LENGTH://Read master RX
 				if (spi1.SPI_Comm.TX_state == SPI_READY){
-					delay();
+					delay(500000);
 					SPI_Read(&spi1, &myRXbuffer, 1); //1 byte to be read
 					flagSPI = SEND_STATE;
 				}
@@ -211,7 +211,7 @@ int main(void)
 
 			case SEND_STATE: //send the state
 				if (spi1.SPI_Comm.RX_state == SPI_READY){
-					delay();
+					delay(500000);
 					myTXbuffer = currentState; //in bytes
 					SPI_Send(&spi1, &myTXbuffer, 1);
 					flagSPI = READ_STATE;
@@ -220,7 +220,7 @@ int main(void)
 
 			case READ_STATE: //read RXNE to clear it off to avoid overrun
 				if (spi1.SPI_Comm.TX_state == SPI_READY){
-					delay();
+					delay(500000);
 					SPI_Read(&spi1, &myRXbuffer, 1); //1 byte to be read (dummy read).
 					flagSPI = WAIT_END;
 				}
@@ -228,7 +228,7 @@ int main(void)
 
 			case WAIT_END:
 				if (spi1.SPI_Comm.RX_state == SPI_READY){
-					delay();
+					delay(500000);
 					//clear the flag of current state in order to capture state changes
 					stateChanged = 0;
 
@@ -249,7 +249,7 @@ int main(void)
 			configureADS1115(&i2c1);
 			if (flagADS1115 == ADS1115_CONFIGURED){
 				I2C_EnableDisable(&i2c1,ENABLE);
-				I2C_Master_Receiver(&i2c1, ADS1115_CONVERSION_REGISTER_BYTES, 1);//1st byte read(MSB of Conversion register)+2nd byte read(LSB)
+				I2C_Master_Receiver(&i2c1, ADS1115_CONVERSION_REGISTER_BYTES, 1, bytes_from_ADS1115);//1st byte read(MSB of Conversion register)+2nd byte read(LSB)
 			}
 		}
 
@@ -259,7 +259,7 @@ int main(void)
 
 /***********************************************ISR handlers****************************************************************/
 void EXTI2_3_IRQHandler(void){ //when button on-off
-	delay();
+	delay(500000);
 	GPIO_IRQ_Handling(PIN_BUTTON_OFFON);
 	if (currentState == OFF){
 		currentState = ON;
@@ -281,7 +281,7 @@ void EXTI2_3_IRQHandler(void){ //when button on-off
 }
 
 void EXTI4_15_IRQHandler(void){
-	delay();
+	delay(500000);
 	GPIO_IRQ_Handling(PIN_BUTTON_EMERGENCY);
 	if (currentState != EMERGENCY){
 		stateChanged = 1;
@@ -315,13 +315,7 @@ void I2C1_IRQHandler(void){
 }
 //callback
 void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
-	if (Event == I2C_NEW_READING){ //new value from the external ADC (temperature sensor)
-		byteRead = *(pI2Chandle->I2C_Comm_t.RX_buffer);
-		if (!boolFirstByteRead){
-			boolFirstByteRead = 1; //first byte read from ADS1115 (MSB)
-			firstByteRead = byteRead;
-		}
-	}
+	//without event I2C_NEW_READING because it might cause slowness for reading RXNE (OVR not triggered for master)
 	if ((Event == I2C_RESTART_STOP) || (Event == I2C_FINISHED)){
 		//if ADS1115 not configured yet,focus on that:
 		if (flagADS1115 != ADS1115_CONFIGURED){
@@ -338,10 +332,11 @@ void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
 			}
 		}
 		else{ //if ADS1115 has already been configured, finish reading the ADC value
-			restart = 1;
+			firstByteRead = *(pI2Chandle->I2C_Comm_t.RX_buffer+1);
+			byteRead = *(pI2Chandle->I2C_Comm_t.RX_buffer);
 			lastADS1115_raw = (firstByteRead<<8)|byteRead; //byteRead is LSB and firstByteRead is MSB
-			boolFirstByteRead = 0; //because next reading will be the first byte to be read from ADS1115
 			flagADS1115 = ADS1115_NOT_STARTED;
+			restart = 1;
 		}
 
 
@@ -488,15 +483,22 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 	//https://cdn-shop.adafruit.com/datasheets/ads1115.pdf
 	if (flagADS1115 < ADS1115_1ST_DURING){
 		//continuous mode
-		//1-write to config reg. bit 8 mode(0:continuous;1:single-shot,default);bits 9-11:gain amplifier.bit 15 set to 1 starts single shot (in single-shot mode)
-		//transmiter:address+0x01(points to config reg)+0b10000100(MSB:start shot+default gain+continuous)+0b10000011(LSB:default rate+no comparator)
+		/*1-write to config reg. bit 8 mode(0:continuous;1:single-shot,default);bits 9-11:gain amplifier.bit 15 set to 1 starts single shot
+		*bits 14-12:multiplexor configuration
+		*transmiter:address+0x01(points to config reg)+0b10000100(MSB:start shot+default gain+continuous)+0b10000011(LSB:default rate+no comparator)*/
 		bytes_to_ADS1115_reg[0] = 0x01; //0x01(points to config reg)
-		bytes_to_ADS1115_reg[1] = 0x84; //0b10000100 (MSB)
+
+		//for continuous mode. +-4.076V, 128 sps, bits 14-12 110: AINp=AIN0 and AInn=GND (single ended measurement for A0).
+		//bytes_to_ADS1115_reg[1] = 0xC2; //0b11000010 (MSB)
+		//bytes_to_ADS1115_reg[2] = 0x83; //0b10000011 (LSB)
+		//for single-shot. bit 15: begin single conversion. bit 8: 1-single shot
+		bytes_to_ADS1115_reg[1] = 0xC3; //0b11000011 (MSB)
 		bytes_to_ADS1115_reg[2] = 0x83; //0b10000011 (LSB)
-		pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
+
+		//pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
 		flagADS1115 = ADS1115_1ST_DURING;
 		I2C_EnableDisable(&i2c1,ENABLE);
-		I2C_Master_Transmitter(pI2Chandle, 3, 1);
+		I2C_Master_Transmitter(pI2Chandle, 3, 1, bytes_to_ADS1115_reg);
 	}
 
 
@@ -504,10 +506,10 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 		//2-select the conversion register by writing to pointer reg(0x00:conversion reg;0x01:config reg)
 		//transmitter:address+0x00(points to conversion register)
 		bytes_to_ADS1115_reg[0] = 0x00; //0x00(points to conversion register)
-		pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
+		//pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
 		flagADS1115 = ADS1115_2ND_DURING;
 		I2C_EnableDisable(&i2c1,ENABLE);
-		I2C_Master_Transmitter(pI2Chandle, 1, 1);
+		I2C_Master_Transmitter(pI2Chandle, 1, 1, bytes_to_ADS1115_reg);
 	}
 
 }

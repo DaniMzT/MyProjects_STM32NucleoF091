@@ -80,8 +80,8 @@ void I2C_IRQ_EnableDisable(uint8_t IRQ_Number, uint8_t EnableDisable); //IRQ_I2C
 void I2C_IRQ_Priority(uint8_t IRQ_Number, uint32_t IRQ_Priority);
 void I2C_IRQ_Handling(I2C_Handle_t *pI2Chandle);
 
-void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend);
-void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend);
+void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend, uint8_t* appTxBuffer);
+void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend, uint8_t* appRxBuffer);
 void I2C_Master_Manual_Stop(I2C_Handle_t *pI2Chandle); //sends STOP when autoend=0.called in main program
 //to be done: same but in case of STM32 being slave
 

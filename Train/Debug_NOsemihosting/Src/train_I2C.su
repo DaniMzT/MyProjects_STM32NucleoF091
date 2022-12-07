@@ -1,10 +1,10 @@
 ../Src/train_I2C.c:90:5:stringLength	24	static
-../Src/train_I2C.c:100:6:delay	16	static
+../Src/train_I2C.c:100:6:delay	24	static
 ../Src/train_I2C.c:116:5:main	8	static
 ../Src/train_I2C.c:261:6:EXTI2_3_IRQHandler	8	static
 ../Src/train_I2C.c:283:6:EXTI4_15_IRQHandler	8	static
 ../Src/train_I2C.c:299:6:SPI1_IRQHandler	8	static
 ../Src/train_I2C.c:313:6:I2C1_IRQHandler	8	static
 ../Src/train_I2C.c:317:6:I2C_App_Callback	16	static
-../Src/train_I2C.c:354:6:peripheral_Config_Ini	32	static
-../Src/train_I2C.c:487:6:configureADS1115	16	static
+../Src/train_I2C.c:349:6:peripheral_Config_Ini	32	static
+../Src/train_I2C.c:482:6:configureADS1115	16	static

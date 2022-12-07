@@ -97,7 +97,19 @@ void I2C_IRQ_EnableDisable(uint8_t IRQ_Number, uint8_t EnableDisable){ //IRQ_I2C
 }
 
 void I2C_IRQ_Priority(uint8_t IRQ_Number, uint32_t IRQ_Priority){
-	//if required, reuse the same function in spi (better a common function in stm32f091rct6.h?)
+	//7 IPR registers, each one in 8-bits blocks for every IRQ. So 4 IRQ per IPR
+	/*Each priority field holds a priority value, 0-192. The lower the value, the greater the priority of the corresponding interrupt.
+	 * The processor implements only bits[7:6] of each field, bits [5:0] read as zero and ignore writes
+	 * Programmable priority level 0-192 in steps of 64 for each interrupt. level 0 is the highest interrupt priority.*/
+	if (IRQ_Priority>255) { //in order not to affect the next blocks
+		IRQ_Priority=255;
+	}
+	uint8_t numberIPR = IRQ_Number / 4;
+	uint8_t blockIPR = IRQ_Number % 4;
+	//Clear the block and set. Better if I use intermediate variables instead of modifying many times the IPR
+	uint32_t tempIPR = ((*(NVIC_IPR_BASE + numberIPR))&~(0xFF<<blockIPR));
+	tempIPR |= (IRQ_Priority<<(8*blockIPR+6)); //6 is because bits 0-5 are not editable, only bits 6-7 count.
+	*(NVIC_IPR_BASE + numberIPR) = tempIPR;
 }
 
 void I2C_IRQ_Handling(I2C_Handle_t *pI2Chandle){
@@ -146,7 +158,7 @@ static void I2C_SlaveAddress(I2C_Handle_t *pI2Chandle){
 	}
 }
 
-void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend){
+void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend, uint8_t* appTxBuffer){
 	//TX state busy + configure transmission(including interrupts) + start&address
 	if (pI2Chandle->I2C_Comm_t.communication_state != (I2C_DURING_TX || I2C_DURING_RX)){
 		//start transmission (start+slave address) if I2C_READY,I2C_RESTART_STOP or I2C_RELOAD
@@ -197,6 +209,7 @@ void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t
 			//do something extra?
 		}
 		*/
+		pI2Chandle->I2C_Comm_t.TX_buffer = appTxBuffer; //I2C TX buffer pointing to app's TX buffer
 		pI2Chandle->I2C_Comm_t.communication_state = I2C_DURING_TX;
 		//start + address. this would clear TC if it had been set (RESTART_STOP)
 		//This bit is set by SW and cleared by HW after Start followed by address sequence is sent
@@ -206,7 +219,7 @@ void I2C_Master_Transmitter(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t
 
 }
 
-void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend){
+void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t autoend, uint8_t* appRxBuffer){
 	//RX state busy + configure reception(including interrupts) + start&address
 	if (pI2Chandle->I2C_Comm_t.communication_state != (I2C_DURING_TX || I2C_DURING_RX)){
 		//start transmission (start+slave address) if I2C_READY,I2C_RESTART_STOP or I2C_RELOAD
@@ -256,6 +269,7 @@ void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t au
 			//something extra?
 		}
 		*/
+		pI2Chandle->I2C_Comm_t.RX_buffer = appRxBuffer; //I2C RX buffer pointing to app's RX buffer
 		pI2Chandle->I2C_Comm_t.communication_state = I2C_DURING_RX;
 		//start + address. this would clear TC if it had been set (RESTART_STOP)
 		//This bit is set by SW and cleared by HW after Start followed by address sequence is sent
@@ -305,17 +319,21 @@ static void I2C_TXIS_handler(I2C_Handle_t *pI2Chandle){
 static void I2C_RXNE_handler(I2C_Handle_t *pI2Chandle){
 	/*RXNE is set by hardware when received data is copied into I2C_RXDR register, and
 	*is ready to be read. It is cleared when I2C_RXDR is read*/
-	if (pI2Chandle->I2C_Comm_t.RX_length >=1){
-		*(pI2Chandle->I2C_Comm_t.RX_buffer) = pI2Chandle->pI2C->I2C_RXDR;
-		pI2Chandle->I2C_Comm_t.RX_buffer++;
+	if (pI2Chandle->I2C_Comm_t.RX_length >= 1){
+		*pI2Chandle->I2C_Comm_t.RX_buffer = ((uint8_t)pI2Chandle->pI2C->I2C_RXDR);
+		pI2Chandle->I2C_Comm_t.RX_buffer++; //increase address of the I2C buffer
 		pI2Chandle->I2C_Comm_t.RX_length--;
 		/*if last byte to be send,wait until STOP or TC/TCR,depending on AUTOEND(these interrupts are handled)
 		*state=WAITING_END (STOP or TC/TCR flag)
 		*if NBYTES>255, I2C_RELOAD*/
-		if (pI2Chandle->I2C_Comm_t.RX_length == 0){
+		if (pI2Chandle->I2C_Comm_t.RX_length == 0){ //no more bytes to read
 			pI2Chandle->I2C_Comm_t.communication_state = I2C_WAITING_END;
+			/*if (pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_REPEAT_START){
+				//inform the main application of a new read value, through callback. In case of last byte in autoend, STOP will send it
+				I2C_App_Callback(pI2Chandle, I2C_NEW_READING);
+			}*/
 			//If autoend,STOP interrupt (previous NACK sent) may happen too early, so check it from here
-			/*if (pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_AUTOEND){
+			/*else{ //pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_AUTOEND)
 				if (pI2Chandle->pI2C->I2C_ISR & (1<<I2C_ISR_STOPF)) {//flag already set
 					pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
 					pI2Chandle->I2C_Comm_t.RX_buffer = NULL; //null pointer
@@ -324,12 +342,11 @@ static void I2C_RXNE_handler(I2C_Handle_t *pI2Chandle){
 					I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
 					I2C_App_Callback(pI2Chandle, I2C_FINISHED);
 				}
+				//no callback, STOP handler will do
 			}*/
 		}
 	}
 
-	//inform the main application of a new read value, through callback
-	I2C_App_Callback(pI2Chandle, I2C_NEW_READING);
 }
 
 static void I2C_BERR_handler(I2C_Handle_t *pI2Chandle){
@@ -351,8 +368,6 @@ static void I2C_STOP_handler(I2C_Handle_t *pI2Chandle){
 	//if I2C_WAITING_END --> I2C_READY. Close transmission/reception,buffer pointing to NULL
 	if (pI2Chandle->I2C_Comm_t.communication_state == I2C_WAITING_END){
 		pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
-		pI2Chandle->I2C_Comm_t.RX_buffer = NULL; //null pointer
-		pI2Chandle->I2C_Comm_t.TX_buffer = NULL; //null pointer
 		pI2Chandle->pI2C->I2C_ICR |= (1<<I2C_ICR_STOPCF);
 		I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
 		I2C_App_Callback(pI2Chandle, I2C_FINISHED);
