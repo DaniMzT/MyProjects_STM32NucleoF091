@@ -80,11 +80,16 @@ enum stateSPI flagSPI = SEND_PRINT;
 //I2C related
 uint8_t restart = 1; //flag to enable/disable restart. Based on callback from I2C
 uint16_t lastADS1115_raw = 0;
+uint16_t lastADS1115_mV = 0;
+#define ADS1115_GAIN 4076 //Gain amplifier in mV, check ADS1115 datasheet
+#define ADS1115_MAX 32768 //15 bytes
 uint8_t bytes_to_ADS1115_reg[3] = {0x00,0x00,0x00}; //for ADS1115 configuration (it can require 3 bytes)
 uint8_t bytes_from_ADS1115[2] = {0x00,0x00}; //data received from ADS1115 (conversion register)
 enum stateADS1115{ADS1115_NOT_STARTED,ADS1115_1ST_DURING,ADS1115_1ST_DONE,ADS1115_2ND_DURING,ADS1115_CONFIGURED};
 enum stateADS1115 flagADS1115 = ADS1115_NOT_STARTED;
-uint8_t startRX = 0;
+uint8_t startRX = 0; //boolean to know if START (Address+read bit) has been sent for receiving ADS1115
+uint16_t testCounter_measurements = 0;
+#define I2C_MAX_MEASUREMENTS	5 //limit of I2C measurements (testing)
 
 int stringLength(char *charSt){ //to know the length of a string instead of using external functions
 	int length = 0;
@@ -243,14 +248,14 @@ int main(void)
 
 			}
 		}*/
-		if (restart || (flagADS1115 != ADS1115_NOT_STARTED)){
+		if ((restart || (flagADS1115 != ADS1115_NOT_STARTED)) && testCounter_measurements < I2C_MAX_MEASUREMENTS ){
 			restart = 0;
 			configureADS1115(&i2c1);
 			if ((flagADS1115 == ADS1115_CONFIGURED) && !startRX) {
 				//I2C_EnableDisable(&i2c1,ENABLE);
 				I2C_Master_Receiver(&i2c1, ADS1115_CONVERSION_REGISTER_BYTES, 1, bytes_from_ADS1115);//1st byte read(MSB of Conversion register)+2nd byte read(LSB)
 				startRX = 1;
-				i2c1.pI2C->I2C_CR2 |= (1<<I2C_CR2_START);
+				//I2C_Start(&i2c1); //triggered directly in I2C_Master_Receiver;in case of problems,do it from here and comment in I2C_Master_Receiver
 			}
 		}
 
@@ -316,8 +321,7 @@ void I2C1_IRQHandler(void){
 }
 //callback
 void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
-	//without event I2C_NEW_READING because it might cause slowness for reading RXNE (OVR not triggered for master)
-	if ((Event == I2C_RESTART_STOP) || (Event == I2C_FINISHED)){
+	if (Event == I2C_FINISHED){
 		//if ADS1115 not configured yet,focus on that:
 		if (flagADS1115 != ADS1115_CONFIGURED){
 			switch (flagADS1115){
@@ -332,15 +336,18 @@ void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
 				break;
 			}
 		}
-		else{ //if ADS1115 has already been configured, finish reading the ADC value
+		else{ //if ADS1115 has already been configured and a STOPF happens, disable I2C
 			I2C_EnableDisable(&i2c1,DISABLE);
-			lastADS1115_raw = (bytes_from_ADS1115[0] << 8)|(bytes_from_ADS1115[1]); //byteRead is LSB and firstByteRead is MSB
-			flagADS1115 = ADS1115_NOT_STARTED;
-			restart = 1;
-			startRX = 0;
 		}
 
-
+	}
+	else if (Event == I2C_NEW_READING){ //here when RX length == 0
+		lastADS1115_raw = (bytes_from_ADS1115[0] << 8)|(bytes_from_ADS1115[1]); //byteRead is LSB and firstByteRead is MSB
+		lastADS1115_mV = lastADS1115_raw * ADS1115_GAIN/ADS1115_MAX;
+		flagADS1115 = ADS1115_NOT_STARTED;
+		restart = 1;
+		startRX = 0;
+		testCounter_measurements++;
 	}
 
 }
@@ -500,6 +507,7 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 		flagADS1115 = ADS1115_1ST_DURING;
 		I2C_EnableDisable(&i2c1,ENABLE);
 		I2C_Master_Transmitter(pI2Chandle, 3, 1, bytes_to_ADS1115_reg);
+		//I2C_Start(pI2Chandle); //triggered directly in I2C_Master_Transmitter;in case of problems,do it from here and comment in I2C_Master_Transmitter
 	}
 
 
@@ -511,6 +519,7 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 		flagADS1115 = ADS1115_2ND_DURING;
 		//I2C_EnableDisable(&i2c1,ENABLE);
 		I2C_Master_Transmitter(pI2Chandle, 1, 1, bytes_to_ADS1115_reg);
+		//I2C_Start(pI2Chandle); //triggered directly in I2C_Master_Transmitter;in case of problems,do it from here and comment in I2C_Master_Transmitter
 	}
 
 }
