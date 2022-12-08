@@ -229,6 +229,7 @@ void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t au
 		I2C_SlaveAddress(pI2Chandle);
 		//enable RXIE,necessary for RXNE
 		pI2Chandle->pI2C->I2C_CR1 |= (1<<I2C_CR1_RXIE);
+		pI2Chandle->I2C_Comm_t.I2C_Nbytes = exp_bytes;
 		//if exp_bytes > 255 --> RELOAD = 1, enable TCR
 		if (pI2Chandle->I2C_Comm_t.I2C_Nbytes > 255){ //RELOAD mode (AUTOEND does not apply)
 			pI2Chandle->pI2C->I2C_CR2 |= (255<<I2C_CR2_NBYTES); //write NBYTES --> this would clear TCR by the way
@@ -273,8 +274,8 @@ void I2C_Master_Receiver(I2C_Handle_t *pI2Chandle, uint8_t exp_bytes, uint8_t au
 		pI2Chandle->I2C_Comm_t.communication_state = I2C_DURING_RX;
 		//start + address. this would clear TC if it had been set (RESTART_STOP)
 		//This bit is set by SW and cleared by HW after Start followed by address sequence is sent
-		pI2Chandle->pI2C->I2C_CR2 |= (1<<I2C_CR2_START);
-		//I2C_App_Callback(pI2Chandle, I2C_RX_STARTED);
+		//pI2Chandle->pI2C->I2C_CR2 |= (1<<I2C_CR2_START);
+
 	}
 }
 //to be done: same but in case of STM32 being slave
@@ -300,17 +301,6 @@ static void I2C_TXIS_handler(I2C_Handle_t *pI2Chandle){
 		*if NBYTES>255, I2C_RELOAD*/
 		if (pI2Chandle->I2C_Comm_t.TX_length == 0){
 			pI2Chandle->I2C_Comm_t.communication_state = I2C_WAITING_END;
-			//If autoend,STOP interrupt may happen too early, so check it from here
-			/*if (pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_AUTOEND){
-				if (pI2Chandle->pI2C->I2C_ISR & (1<<I2C_ISR_STOPF)){ //flag already set
-					pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
-					pI2Chandle->I2C_Comm_t.RX_buffer = NULL; //null pointer
-					pI2Chandle->I2C_Comm_t.TX_buffer = NULL; //null pointer
-					pI2Chandle->pI2C->I2C_ICR |= (1<<I2C_ICR_STOPCF);
-					I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
-					I2C_App_Callback(pI2Chandle, I2C_FINISHED);
-				}
-			}*/
 		}
 	}
 
@@ -326,24 +316,9 @@ static void I2C_RXNE_handler(I2C_Handle_t *pI2Chandle){
 		/*if last byte to be send,wait until STOP or TC/TCR,depending on AUTOEND(these interrupts are handled)
 		*state=WAITING_END (STOP or TC/TCR flag)
 		*if NBYTES>255, I2C_RELOAD*/
-		if (pI2Chandle->I2C_Comm_t.RX_length == 0){ //no more bytes to read
-			pI2Chandle->I2C_Comm_t.communication_state = I2C_WAITING_END;
-			/*if (pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_REPEAT_START){
-				//inform the main application of a new read value, through callback. In case of last byte in autoend, STOP will send it
-				I2C_App_Callback(pI2Chandle, I2C_NEW_READING);
-			}*/
-			//If autoend,STOP interrupt (previous NACK sent) may happen too early, so check it from here
-			/*else{ //pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_AUTOEND)
-				if (pI2Chandle->pI2C->I2C_ISR & (1<<I2C_ISR_STOPF)) {//flag already set
-					pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
-					pI2Chandle->I2C_Comm_t.RX_buffer = NULL; //null pointer
-					pI2Chandle->I2C_Comm_t.TX_buffer = NULL; //null pointer
-					pI2Chandle->pI2C->I2C_ICR |= (1<<I2C_ICR_STOPCF);
-					I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
-					I2C_App_Callback(pI2Chandle, I2C_FINISHED);
-				}
-				//no callback, STOP handler will do
-			}*/
+		if ((pI2Chandle->I2C_Comm_t.I2C_RepeatStart == I2C_AUTOEND) && (pI2Chandle->I2C_Comm_t.RX_length <= 1 )){
+			pI2Chandle->I2C_Comm_t.communication_state = I2C_WAITING_END; //autoend: STOP
+			//no callback, STOP handler will do
 		}
 	}
 
@@ -360,8 +335,6 @@ static void I2C_BERR_handler(I2C_Handle_t *pI2Chandle){
 	I2C_App_Callback(pI2Chandle, I2C_BERR_ERROR);
 }
 
-/*The STOP interruption happens too fast for the code,so I also handle STOP flag from TXIS.
-*Anyway, just in case:*/
 static void I2C_STOP_handler(I2C_Handle_t *pI2Chandle){
 	/*This flag is set by hardware when a STOP condition is detected on the bus and the
 	*peripheral is involved in this transfer. It is cleared by software by setting the STOPCF bit.*/
@@ -369,7 +342,7 @@ static void I2C_STOP_handler(I2C_Handle_t *pI2Chandle){
 	if (pI2Chandle->I2C_Comm_t.communication_state == I2C_WAITING_END){
 		pI2Chandle->I2C_Comm_t.communication_state = I2C_READY;
 		pI2Chandle->pI2C->I2C_ICR |= (1<<I2C_ICR_STOPCF);
-		I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
+		//I2C_EnableDisable(pI2Chandle,DISABLE); //Disable I2C
 		I2C_App_Callback(pI2Chandle, I2C_FINISHED);
 	}
 

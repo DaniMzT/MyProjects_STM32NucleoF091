@@ -78,14 +78,13 @@ enum stateSPI{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,S
 enum stateSPI flagSPI = SEND_PRINT;
 
 //I2C related
-uint8_t byteRead = 0;
-uint8_t firstByteRead = 0;
 uint8_t restart = 1; //flag to enable/disable restart. Based on callback from I2C
 uint16_t lastADS1115_raw = 0;
 uint8_t bytes_to_ADS1115_reg[3] = {0x00,0x00,0x00}; //for ADS1115 configuration (it can require 3 bytes)
 uint8_t bytes_from_ADS1115[2] = {0x00,0x00}; //data received from ADS1115 (conversion register)
 enum stateADS1115{ADS1115_NOT_STARTED,ADS1115_1ST_DURING,ADS1115_1ST_DONE,ADS1115_2ND_DURING,ADS1115_CONFIGURED};
 enum stateADS1115 flagADS1115 = ADS1115_NOT_STARTED;
+uint8_t startRX = 0;
 
 int stringLength(char *charSt){ //to know the length of a string instead of using external functions
 	int length = 0;
@@ -247,9 +246,11 @@ int main(void)
 		if (restart || (flagADS1115 != ADS1115_NOT_STARTED)){
 			restart = 0;
 			configureADS1115(&i2c1);
-			if (flagADS1115 == ADS1115_CONFIGURED){
-				I2C_EnableDisable(&i2c1,ENABLE);
+			if ((flagADS1115 == ADS1115_CONFIGURED) && !startRX) {
+				//I2C_EnableDisable(&i2c1,ENABLE);
 				I2C_Master_Receiver(&i2c1, ADS1115_CONVERSION_REGISTER_BYTES, 1, bytes_from_ADS1115);//1st byte read(MSB of Conversion register)+2nd byte read(LSB)
+				startRX = 1;
+				i2c1.pI2C->I2C_CR2 |= (1<<I2C_CR2_START);
 			}
 		}
 
@@ -332,11 +333,11 @@ void I2C_App_Callback(I2C_Handle_t *pI2Chandle,uint8_t Event){
 			}
 		}
 		else{ //if ADS1115 has already been configured, finish reading the ADC value
-			firstByteRead = *(pI2Chandle->I2C_Comm_t.RX_buffer+1);
-			byteRead = *(pI2Chandle->I2C_Comm_t.RX_buffer);
-			lastADS1115_raw = (firstByteRead<<8)|byteRead; //byteRead is LSB and firstByteRead is MSB
+			I2C_EnableDisable(&i2c1,DISABLE);
+			lastADS1115_raw = (bytes_from_ADS1115[0] << 8)|(bytes_from_ADS1115[1]); //byteRead is LSB and firstByteRead is MSB
 			flagADS1115 = ADS1115_NOT_STARTED;
 			restart = 1;
+			startRX = 0;
 		}
 
 
@@ -508,7 +509,7 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 		bytes_to_ADS1115_reg[0] = 0x00; //0x00(points to conversion register)
 		//pI2Chandle->I2C_Comm_t.TX_buffer = bytes_to_ADS1115_reg; //buffer pointing to bytes_to_ADS1115_reg
 		flagADS1115 = ADS1115_2ND_DURING;
-		I2C_EnableDisable(&i2c1,ENABLE);
+		//I2C_EnableDisable(&i2c1,ENABLE);
 		I2C_Master_Transmitter(pI2Chandle, 1, 1, bytes_to_ADS1115_reg);
 	}
 
