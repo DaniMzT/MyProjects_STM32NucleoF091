@@ -6,15 +6,15 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Src/sysmem.c \
-../Src/train_I2C.c 
+../Src/train_LCD_timers.c 
 
 OBJS += \
 ./Src/sysmem.o \
-./Src/train_I2C.o 
+./Src/train_LCD_timers.o 
 
 C_DEPS += \
 ./Src/sysmem.d \
-./Src/train_I2C.d 
+./Src/train_LCD_timers.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -24,7 +24,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/train_I2C.d ./Src/train_I2C.o ./Src/train_I2C.su
+	-$(RM) ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/train_LCD_timers.d ./Src/train_LCD_timers.o ./Src/train_LCD_timers.su
 
 .PHONY: clean-Src
 

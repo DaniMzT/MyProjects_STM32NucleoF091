@@ -262,7 +262,7 @@ void SPI_Send(SPI_Handle_t *pSPIhandle, uint8_t *pTXbuffer, uint32_t length){
 	//set TX state as busy (SPI_DURING_TX) and configure the transmission
 	if (pSPIhandle->SPI_Comm.TX_state != SPI_DURING_TX){
 		pSPIhandle->SPI_Comm.TX_state = SPI_DURING_TX;
-		pSPIhandle->SPI_Comm.TX_buffer = pTXbuffer;
+		pSPIhandle->SPI_Comm.TX_buffer = pTXbuffer; //SPI TX buffer pointing to app's TX buffer
 		pSPIhandle->SPI_Comm.TX_length = length;
 		pSPIhandle->pSPI->SPI_CR2 |= (1 << SPI_CR2_TXEIE);//enable the TX interrupt to start transmission
 	}
@@ -271,7 +271,7 @@ void SPI_Read(SPI_Handle_t *pSPIhandle, volatile uint8_t *pRXbuffer, uint32_t le
 	//set RX state as busy (SPI_DURING_RX) and configure the reading process (DR fetches from RX buffer).
 	if (pSPIhandle->SPI_Comm.RX_state != SPI_DURING_RX){
 		pSPIhandle->SPI_Comm.RX_state = SPI_DURING_RX;
-		pSPIhandle->SPI_Comm.RX_buffer = pRXbuffer;
+		pSPIhandle->SPI_Comm.RX_buffer = pRXbuffer; //SPI RX buffer pointing to app's RX buffer
 		pSPIhandle->SPI_Comm.RX_length = length;
 		pSPIhandle->pSPI->SPI_CR2 |= (1 << SPI_CR2_RXNEIE);//enable the RX interrupt to start reception
 	}

@@ -1,6 +1,7 @@
 "./Src/sysmem.o"
-"./Src/train_I2C.o"
+"./Src/train_LCD_timers.o"
 "./Startup/startup_stm32f091rctx.o"
+"./myDrivers/SrcDrivers/basicTimers.o"
 "./myDrivers/SrcDrivers/gpio.o"
 "./myDrivers/SrcDrivers/i2c.o"
 "./myDrivers/SrcDrivers/spi.o"

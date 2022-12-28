@@ -1,0 +1,16 @@
+../myDrivers/SrcDrivers/basicTimers.c:11:6:BasicTimer_ClockControl	16	static
+../myDrivers/SrcDrivers/basicTimers.c:31:6:BasicTimer_Init	16	static
+../myDrivers/SrcDrivers/basicTimers.c:46:6:BasicTimer_EnableDisable	16	static
+../myDrivers/SrcDrivers/basicTimers.c:58:6:BasicTimer_Reset	16	static
+../myDrivers/SrcDrivers/basicTimers.c:69:10:BasicTimer_GetCounter	16	static
+../myDrivers/SrcDrivers/basicTimers.c:74:6:BasicTimer_RestartCounter	16	static
+../myDrivers/SrcDrivers/basicTimers.c:79:6:BasicTimer_IRQ_EnableDisable	16	static
+../myDrivers/SrcDrivers/basicTimers.c:87:6:BasicTimer_IRQ_Priority	32	static
+../myDrivers/SrcDrivers/basicTimers.c:102:6:BasicTimer_IRQ_Handling	16	static
+../myDrivers/SrcDrivers/basicTimers.c:116:28:BasicTimer_App_Callback	16	static
+../myDrivers/SrcDrivers/basicTimers.c:121:6:BasicTimer_UDIS	16	static
+../myDrivers/SrcDrivers/basicTimers.c:131:39:VirtualBasicTimer_Elapsed	16	static
+../myDrivers/SrcDrivers/basicTimers.c:153:6:VirtualBasicTimer_EnableDisable	16	static
+../myDrivers/SrcDrivers/basicTimers.c:161:6:VirtualBasicTimer_StartCounter	16	static
+../myDrivers/SrcDrivers/basicTimers.c:166:6:VirtualBasicTimer_StopCounter	16	static
+../myDrivers/SrcDrivers/basicTimers.c:173:28:VirtualBasicTimer_App_Callback	16	static

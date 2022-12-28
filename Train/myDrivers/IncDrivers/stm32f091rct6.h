@@ -438,9 +438,66 @@ typedef struct
 #define I2C_ADDRESS_MODE_7BIT		0
 #define I2C_ADDRESS_MODE_10BIT		1
 
+/*************************************BASIC TIMERS****************************************************************/
+//struct referred to registers.16-bit addressable registers,but offsets are every 32bits (+gap between CR2-DIER and EGR-CNT)
+typedef struct{
+	volatile uint32_t TIM_CR1; /*control register 1.offset:0x00*/
+	volatile uint32_t TIM_CR2; /*control register 2.offset:0x04*/
+	volatile uint32_t EMPTY1; /*0x08*/
+	volatile uint32_t TIM_DIER; /*DMA/interrupt enable.offset:0x0C*/
+	volatile uint32_t TIM_SR; /*status register (UIF:update interrupt flag).offset:0x10*/
+	volatile uint32_t TIM_EGR; /*event generation register* (UG:update generation reinitializes counter).offset:0x14*/
+	volatile uint32_t EMPTY2; /*offset:0x18*/
+	volatile uint32_t EMPTY3; /*offset:0x1C*/
+	volatile uint32_t EMPTY4; /*offset:0x20*/
+	volatile uint32_t TIM_CNT; /*counter. offset: 0x24*/
+	volatile uint32_t TIM_PSC; /*prescaler PSC: fCK_PSC / (PSC[15:0] + 1). offset: 0x28*/
+	volatile uint32_t TIM_ARR; /*it's the value to be loaded into autoreload. offset: 0x2C*/
+}BasicTimer_RegStruct_t;
+
+//pointer
+#define BASIC_TIMER_6 ((BasicTimer_RegStruct_t*)TIM6_BASE)
+#define BASIC_TIMER_7 ((BasicTimer_RegStruct_t*)TIM7_BASE)
+
+//enable timer peripheral clock
+#define BasicTimer_6_Clock_Enable()			((RCC->APB1ENR)|=(1<<4))
+#define BasicTimer_7_Clock_Enable()			((RCC->APB1ENR)|=(1<<5))
+
+//disable timer peripheral clock
+#define BasicTimer_6_Clock_Disable()			((RCC->APB1ENR)&=(~(1<<4)))
+#define BasicTimer_7_Clock_Disable()			((RCC->APB1ENR)&=(~(1<<5)))
+
+//Reset timer peripheral clock
+#define BasicTimer_6_Clock_Reset()			((RCC->APB1RSTR)|=(1<<4))
+#define BasicTimer_7_Clock_Reset()			((RCC->APB1RSTR)|=(1<<5))
+
+//bit positions in the registers
+//CR1
+#define TIM_CR1_ARPE 7 //autoreload preload enable; 0: not buffered; 1: buffered
+#define TIM_CR1_OPM 3 //one-pulse mode; 0: counter not stopped at update event
+#define TIM_CR1_URS 2 //update request source; 1: only overflow/underflow generates interrupt/DMA; 0: all the possible sources can generate it
+#define TIM_CR1_UDIS 1 //update disable; 1: UEV (update event) disabled
+#define TIM_CR1_CEN 0 //counter enabled if 1
+//CR2
+#define TIM_CR2_MMS 4 //[6:4] master mode selection
+//DIER
+#define TIM_DIER_UDE 8 //Update DMA request enable if 1
+#define TIM_DIER_UIE 0 //Update interrupt enable if 1
+//SR
+#define TIM_SR_UIF 0 //set by HW on an update event (overflow/underflow if UDIS=0 ; or when counter reinitialized by TIM_EGR_UG if URS,UDIS=0)
+//EGR
+#define TIM_EGR_UG 0 //update generation. if 1, counter reinitializes
+//CNT
+#define TIM_CNT_CNT 0 //[15:0]
+//PSC
+#define TIM_PSC_PSC //[15:0]
+//ARR
+#define TIM_ARR_ARR //[15:0]
+
 /*************INCLUDE DRIVER HEADERS************/
 #include "gpio.h"
 #include "spi.h"
 #include "i2c.h"
+#include "basicTimers.h"
 
 #endif /* INCDRIVERS_STM32F091RCT6_H_ */
