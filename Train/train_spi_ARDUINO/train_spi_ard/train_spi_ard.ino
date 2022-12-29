@@ -8,7 +8,7 @@
  *
 
  */
-
+#include <LiquidCrystal.h>
 #include <SPI.h>
 //https://www.makerguides.com/master-slave-spi-communication-arduino/
 /*SPCR
@@ -37,37 +37,22 @@ Writing to the register initiates data transmission.
 Reading the register causes the Shift Register Receive buffer to be read.
  */
 
-/*const byte led = 9;           // Slave LED digital I/O pin.
+ //REMOVE AS MANY SERIAL.PRINT AS POSSIBLE! I USE IT FOR TESTING BUT IT TAKES TIME FOR COMMUNICATION
 
-boolean ledState = HIGH;      // LED state flag.*/
+//uint8_t dataBuff[255];
+char dataBuff[32];//32 max because of LCD screen size (16x2)
 
-uint8_t dataBuff[255];
-
-uint8_t board_id[10] = "ARDUINOUNO";
-
+//ACK/NACK for SPI
 #define NACK 0xB1
 #define ACK 0xA1
-
-
-//command codes
-/*#define COMMAND_LED_CTRL          0x50
-#define COMMAND_SENSOR_READ       0x51
-#define COMMAND_LED_READ          0x52
-#define COMMAND_PRINT           0x53
-#define COMMAND_ID_READ         0x54*/
-
+//command codes for SPI
 #define SPI_COMMAND_PRINT    0x50
-#define SPI_COMMAND_LED   0x51
 
-#define LED_ON     1
-#define LED_OFF    0
-
-//arduino analog pins
-#define ANALOG_PIN0   0
-#define ANALOG_PIN1   1
-#define ANALOG_PIN2   2
-#define ANALOG_PIN3   3
-#define ANALOG_PIN4   4
+//LCD
+#define LCD_COLUMNS 16
+#define LCD_ROWS 2
+//initialize library by indicating pins to be used.(RS[5 in LCD], enable[6 in LCD], d4, d5, d6, d7 [7-14]). (rs,enable,d1,d2,d3,d4)
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2); 
 
 //Initialize SPI slave.
 void SPI_SlaveInit(void) 
@@ -91,8 +76,7 @@ uint8_t SPI_SlaveReceive(void)
   while(!(SPSR & (1<<SPIF)));
   /* Return Data Register */
   Serial.print("SPDR,received:");
-  Serial.println(SPDR);
-  Serial.println("ending SlaveReceive");
+  //Serial.println(SPDR); //better not read here
   return SPDR;
   
 }
@@ -101,13 +85,13 @@ uint8_t SPI_SlaveReceive(void)
 //sends one byte of data 
 void SPI_SlaveTransmit(uint8_t data)
 {
-  Serial.print("in SlaveTransmit. SPDR=data transmitted=");
-  Serial.println(data);
+  //Serial.print("in SlaveTransmit. SPDR=data transmitted=");
+  //Serial.println(data);
   /* Start transmission */
   SPDR = data;
   /* Wait for transmission complete */
   while(!(SPSR & (1<<SPIF)));
-  Serial.println("ending SlaveTransmit");
+  //Serial.println("ending SlaveTransmit");
 }
   
 
@@ -121,6 +105,14 @@ void setup()
   /*pinMode(led, OUTPUT);
   
   digitalWrite(led,LOW);*/
+
+  //LCD
+  lcd.begin(LCD_COLUMNS,LCD_ROWS);
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Setup");
+  lcd.setCursor(0,1);
+  lcd.print("working");
   
   // Initialize SPI Slave.
   SPI_SlaveInit();
@@ -158,30 +150,35 @@ void loop()
   //2. now lets wait until rx buffer has a byte
   Serial.println("1.Received command");
   command = SPI_SlaveReceive();
+  Serial.println(command);
   ackornack = checkCommandPrint(command);
   
   Serial.println("2.command to be transmitted when dummy");
+  Serial.println(ackornack);
   SPI_SlaveTransmit(ackornack);
   
   Serial.println("3.Received dummy");
   data = SPI_SlaveReceive(); //dummy byte from STM32 so that ACK/NACK is sent
+  //Serial.println(data);
   
   if ( command == SPI_COMMAND_PRINT)
   {
     Serial.println("4.Received length");
     //uint8_t len = SPI_SlaveReceive(); 
-    len = SPI_SlaveReceive(); 
+    len = SPI_SlaveReceive();
+    Serial.println(len);
+    lcd.clear(); //clear the LCD screen (first time)
     for(i=0 ; i < len ; i++)
     {
       Serial.print(i);
-      Serial.println(" byte position received:");
+      //Serial.println(" byte position received:");
       dataBuff[i] = SPI_SlaveReceive();
+      //Serial.println(dataBuff[i]);
+      lcd.setCursor(i%(LCD_COLUMNS),i/LCD_COLUMNS); // Position the cursor where to write (column,row)
+      lcd.write(dataBuff[i]);
     }
-    /*Serial.print("length:");
-    Serial.println(len);
-    Serial.print("dataBuff: ");
-    Serial.println((char*)dataBuff);
-    Serial.println("RCVD:COMMAND_PRINT");*/
+    //lcd.print(dataBuff);
+
   }
   else{
     Serial.println("Other than PRINT");

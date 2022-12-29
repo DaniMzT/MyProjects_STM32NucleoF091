@@ -57,13 +57,11 @@ SPI_Handle_t spi1;
 *Ard's ACK/NACK by sending dummy data*/
 #define SPI_ARD_ACK		0xA1
 #define SPI_ARD_NACK	0xB1
+#define SPI_ARD_DUMMY	0xC1
 
-/* I need just one byte for the buffers. In case of needing more bytes,define uint8_t buffer[x]
- *  and modify usage (relation array-pointer into account;see previous commits) */
-/* we could try with dynamic arrays based on int*we could use one single buffer for both TX and RX if we had scarce memory*/
-uint8_t* myTXbuffer;
+/* I need just one byte for the RX buffer. For TX,I use TX_byte when 1 byte and then message_spi*/
 uint8_t myRXbuffer;
-uint8_t dummy_byte = 0xC1; //dummy byte for SPI
+uint8_t TX_byte = SPI_ARD_DUMMY; //dummy byte for SPI
 enum stateSPI{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,SEND_STATE,READ_STATE,WAIT_END};
 enum stateSPI flagSPI = SEND_PRINT;
 
@@ -103,9 +101,11 @@ enum train_directions trainDirection = RIGHT;
 const char* station_string = "Station:";
 const char* state_string = ".State:";
 const char* state_string_names[] = {"OFF","ON","EMERGENCY"};
-char* message_spi; //message to be sent to Arduino and displayed in LCD
+#define LCD_CHARS 32 //number of chars LCD can display
+char message_spi[LCD_CHARS]; //message sent to Arduino for LCD.Better wo dynamic allocation as we know max size + malloc would take time in functions
 char station_char;
-char* state_name;
+//char* state_name = malloc(sizeof(state_string_names[2]));
+uint8_t message_spi_length = LCD_CHARS; //the length of the message to be sent via spi, although the real size of message_spi is LCD_CHARS
 
 /*NOT USED BECAUSE STRING.H IS INCLUDED
 int stringLength(char *charSt){ //to know the length of a string instead of using external functions
@@ -132,7 +132,7 @@ void peripheral_Config_Ini(void);
 void flushDR(SPI_Handle_t *pSPIhandle, volatile uint8_t *rxbuffer, uint8_t length);
 
 //STM32-Arduino SPI communication for this application
-void spi_appComm(char** charPointer);
+void spi_appComm();
 
 //configure ADS1115 registers
 void configureADS1115(I2C_Handle_t *pI2Chandle);
@@ -179,7 +179,9 @@ int main(void)
 	/* Loop forever */
 	while (1){
 		//Send information to display in LCD via SPI through Arduino when there is a state change or new station (virtual basic timer update)
-		if (VirtualBasicTimer_Elapsed(&train_virtualTimer) == VIRTUAL_BASIC_TIMER_ELAPSED){ //if emergency/off,virtual timer !=ACTIVE--> FUNCTION_NOT_ACCESSIBLE
+		//Variable flagSPI to know if spi_appComm has not finished (included in the second if)
+		//if emergency/off,virtual timer !=ACTIVE--> FUNCTION_NOT_ACCESSIBLE
+		if (VirtualBasicTimer_Elapsed(&train_virtualTimer) == VIRTUAL_BASIC_TIMER_ELAPSED){
 			switch(trainDirection){
 				case RIGHT:
 					trainStation++;
@@ -197,11 +199,12 @@ int main(void)
 					//error
 					break;
 			}
-			//spi_appComm(&message_spi);
+			spi_appComm(&message_spi);
 			VirtualBasicTimer_StartCounter(&train_virtualTimer); //improve protection in case emergency/off states happened during function?
 		}
-		if (stateChanged){
-			//spi_appComm(&message_spi);
+		if ((stateChanged) || (flagSPI != SEND_PRINT)){
+			//restart spi if stateChanged happens during spi comm due to elapsed station?Atm,let's assume it's fast enough to do both things in a row
+			spi_appComm(&message_spi);
 		}
 
 		//Read temperature sensor via I2C at every timer counter update (restart_I2C==1)
@@ -533,20 +536,19 @@ void configureADS1115(I2C_Handle_t *pI2Chandle){
 }
 
 /************************************SPI COMMUNICATION STM32-ARDUINO************************************/
-void spi_appComm(char** charPointer){
+void spi_appComm(){
 	//switch-case instead of while (TX/RXstate != READ) to avoid blocking
 	switch (flagSPI){ //{SEND_PRINT,READ_PRINT,DUMMY_ACK,READ_ACK,SEND_LENGTH,READ_LENGTH,SEND_STATE,READ_STATE}
 	case SEND_PRINT:
 		//create the message (alternative:create it in case SEND_LENGTH,but maybe modify the startCounter placement)
 	    station_char = trainStation+'0';
-	    state_name = state_string_names[currentState];
-	    //allocate in heap. +1 is for the null terminator at the end
-	    *charPointer = malloc(strlen(station_string)+strlen(&station_char)+strlen(state_string)+strlen(state_name)+1);
-	    //if (*charPointer==NULL) {//error;}
-	    strncpy(*charPointer,station_string,strlen(station_string));
-	    strncat(*charPointer,&station_char,strlen(&station_char));
-	    strncat(*charPointer,state_string,strlen(state_string));
-	    strncat(*charPointer,state_name,strlen(state_name));
+	    //state_name = state_string_names[currentState];
+	    //message_spi[0] = '\0';//to clear the array,since '\0' represents the last element of a char array
+	    strlcpy(message_spi,station_string,strlen(station_string));
+	    strncat(message_spi,&station_char,strlen(&station_char));
+	    strncat(message_spi,state_string,strlen(state_string));
+	    strncat(message_spi,state_string_names[currentState],strlen(state_string_names[currentState]));
+	    message_spi_length = strlen(station_string)+strlen(&station_char)+strlen(state_string)+strlen(state_string_names[currentState])-1;
 
 		//enable SPI and disable it at the end
 		SPI_EnableDisable(&spi1,ENABLE);
@@ -554,8 +556,8 @@ void spi_appComm(char** charPointer){
 		//NOT IMPLEMENTED;IF NECESSARY,COPY FROM debugSemihosting: flushDR(&spi1, &myRXbuffer, 1);
 
 		//Send print command.Ard should store it in its RX buffer and put ACK in TX.Master should receive garbage in shift reg.
-		*myTXbuffer = SPI_COMMAND_PRINT;
-		SPI_Send(&spi1, myTXbuffer, 1); //SPI_Send(&spi1, (uint8_t*)SPI_COMMAND_PRINT, 1);
+		TX_byte = SPI_COMMAND_PRINT;
+		SPI_Send(&spi1, &TX_byte, 1); //SPI_Send(&spi1, (uint8_t*)SPI_COMMAND_PRINT, 1);
 		flagSPI = READ_PRINT;
 		break;
 
@@ -570,7 +572,8 @@ void spi_appComm(char** charPointer){
 	case DUMMY_ACK://Send dummy data to Ard so that master receives ACK/NACK
 		if (spi1.SPI_Comm.RX_state == SPI_READY){
 			delay(500000);
-			SPI_Send(&spi1, &dummy_byte, 1); //length 1 byte
+			TX_byte = SPI_ARD_DUMMY;
+			SPI_Send(&spi1, &TX_byte, 1); //length 1 byte
 			flagSPI = READ_ACK;
 		}
 		break;
@@ -587,8 +590,8 @@ void spi_appComm(char** charPointer){
 		if (spi1.SPI_Comm.RX_state == SPI_READY){
 			delay(500000);
 			if (myRXbuffer == SPI_ARD_ACK){
-				*myTXbuffer = strlen(*charPointer); //in bytes. test: 0x01
-				SPI_Send(&spi1, myTXbuffer, 1);
+				TX_byte = message_spi_length; //in bytes. test: 0x01
+				SPI_Send(&spi1, &TX_byte, 1);
 				flagSPI = READ_LENGTH;
 			}
 			else {
@@ -609,8 +612,7 @@ void spi_appComm(char** charPointer){
 	case SEND_STATE: //send the state+station
 		if (spi1.SPI_Comm.RX_state == SPI_READY){
 			delay(500000);
-			*myTXbuffer = **charPointer; //in bytes. test: currentState
-			SPI_Send(&spi1, myTXbuffer, 1);
+			SPI_Send(&spi1, message_spi, message_spi_length);
 			flagSPI = READ_STATE;
 		}
 		break;
@@ -630,8 +632,6 @@ void spi_appComm(char** charPointer){
 			stateChanged = 0;
 			//Disable SPI
 			SPI_EnableDisable(&spi1,DISABLE);
-			//FREE IN HEAP
-			free(*charPointer);
 			//get ready for the next state change
 			flagSPI = SEND_PRINT;
 		}
