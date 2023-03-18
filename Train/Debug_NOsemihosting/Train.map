@@ -732,7 +732,7 @@ LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.extern
                 0x0000000008000000                g_pfnVectors
                 0x00000000080000c0                . = ALIGN (0x4)
 
-.text           0x00000000080000c0     0x2094
+.text           0x00000000080000c0     0x2098
                 0x00000000080000c0                . = ALIGN (0x4)
  *(.text)
  .text          0x00000000080000c0       0x48 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
@@ -741,287 +741,287 @@ LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.extern
  *(.text*)
  .text.delay    0x0000000008000116       0x26 ./Src/train_LCD_timers.o
                 0x0000000008000116                delay
- .text.main     0x000000000800013c      0x198 ./Src/train_LCD_timers.o
+ .text.main     0x000000000800013c      0x19c ./Src/train_LCD_timers.o
                 0x000000000800013c                main
  .text.EXTI2_3_IRQHandler
-                0x00000000080002d4       0xe0 ./Src/train_LCD_timers.o
-                0x00000000080002d4                EXTI2_3_IRQHandler
+                0x00000000080002d8       0xe0 ./Src/train_LCD_timers.o
+                0x00000000080002d8                EXTI2_3_IRQHandler
  .text.EXTI4_15_IRQHandler
-                0x00000000080003b4       0x88 ./Src/train_LCD_timers.o
-                0x00000000080003b4                EXTI4_15_IRQHandler
+                0x00000000080003b8       0x88 ./Src/train_LCD_timers.o
+                0x00000000080003b8                EXTI4_15_IRQHandler
  .text.SPI1_IRQHandler
-                0x000000000800043c       0x18 ./Src/train_LCD_timers.o
-                0x000000000800043c                SPI1_IRQHandler
+                0x0000000008000440       0x18 ./Src/train_LCD_timers.o
+                0x0000000008000440                SPI1_IRQHandler
  .text.I2C1_IRQHandler
-                0x0000000008000454       0x18 ./Src/train_LCD_timers.o
-                0x0000000008000454                I2C1_IRQHandler
+                0x0000000008000458       0x18 ./Src/train_LCD_timers.o
+                0x0000000008000458                I2C1_IRQHandler
  .text.I2C_App_Callback
-                0x000000000800046c       0xbc ./Src/train_LCD_timers.o
-                0x000000000800046c                I2C_App_Callback
+                0x0000000008000470       0xbc ./Src/train_LCD_timers.o
+                0x0000000008000470                I2C_App_Callback
  .text.TIM7_IRQHandler
-                0x0000000008000528       0x18 ./Src/train_LCD_timers.o
-                0x0000000008000528                TIM7_IRQHandler
+                0x000000000800052c       0x18 ./Src/train_LCD_timers.o
+                0x000000000800052c                TIM7_IRQHandler
  .text.BasicTimer_App_Callback
-                0x0000000008000540       0x1c ./Src/train_LCD_timers.o
-                0x0000000008000540                BasicTimer_App_Callback
+                0x0000000008000544       0x1c ./Src/train_LCD_timers.o
+                0x0000000008000544                BasicTimer_App_Callback
  .text.peripheral_Config_Ini
-                0x000000000800055c      0x2f0 ./Src/train_LCD_timers.o
-                0x000000000800055c                peripheral_Config_Ini
+                0x0000000008000560      0x2f0 ./Src/train_LCD_timers.o
+                0x0000000008000560                peripheral_Config_Ini
  .text.configureADS1115
-                0x000000000800084c       0x74 ./Src/train_LCD_timers.o
-                0x000000000800084c                configureADS1115
+                0x0000000008000850       0x74 ./Src/train_LCD_timers.o
+                0x0000000008000850                configureADS1115
  .text.spi_appComm
-                0x00000000080008c0      0x2c8 ./Src/train_LCD_timers.o
-                0x00000000080008c0                spi_appComm
+                0x00000000080008c4      0x2c8 ./Src/train_LCD_timers.o
+                0x00000000080008c4                spi_appComm
  .text.Reset_Handler
-                0x0000000008000b88       0x50 ./Startup/startup_stm32f091rctx.o
-                0x0000000008000b88                Reset_Handler
+                0x0000000008000b8c       0x50 ./Startup/startup_stm32f091rctx.o
+                0x0000000008000b8c                Reset_Handler
  .text.Default_Handler
-                0x0000000008000bd8        0x2 ./Startup/startup_stm32f091rctx.o
-                0x0000000008000bd8                DMA1_CH4_5_6_7_DMA2_CH3_4_5_IRQHandler
-                0x0000000008000bd8                TIM1_CC_IRQHandler
-                0x0000000008000bd8                TSC_IRQHandler
-                0x0000000008000bd8                HardFault_Handler
-                0x0000000008000bd8                SysTick_Handler
-                0x0000000008000bd8                PVD_IRQHandler
-                0x0000000008000bd8                PendSV_Handler
-                0x0000000008000bd8                NMI_Handler
-                0x0000000008000bd8                RCC_CRS_IRQHandler
-                0x0000000008000bd8                TIM6_DAC_IRQHandler
-                0x0000000008000bd8                I2C2_IRQHandler
-                0x0000000008000bd8                TIM17_IRQHandler
-                0x0000000008000bd8                CEC_CAN_IRQHandler
-                0x0000000008000bd8                RTC_IRQHandler
-                0x0000000008000bd8                TIM16_IRQHandler
-                0x0000000008000bd8                TIM3_IRQHandler
-                0x0000000008000bd8                Default_Handler
-                0x0000000008000bd8                DMA1_CH2_3_DMA2_CH1_2_IRQHandler
-                0x0000000008000bd8                TIM14_IRQHandler
-                0x0000000008000bd8                TIM15_IRQHandler
-                0x0000000008000bd8                EXTI0_1_IRQHandler
-                0x0000000008000bd8                USB_IRQHandler
-                0x0000000008000bd8                SPI2_IRQHandler
-                0x0000000008000bd8                DMA1_CH1_IRQHandler
-                0x0000000008000bd8                SVC_Handler
-                0x0000000008000bd8                WWDG_IRQHandler
-                0x0000000008000bd8                TIM2_IRQHandler
-                0x0000000008000bd8                ADC_COMP_IRQHandler
-                0x0000000008000bd8                USART2_IRQHandler
-                0x0000000008000bd8                USART3_4_5_6_7_8_IRQHandler
-                0x0000000008000bd8                FLASH_IRQHandler
-                0x0000000008000bd8                USART1_IRQHandler
-                0x0000000008000bd8                TIM1_BRK_UP_TRG_COM_IRQHandler
- *fill*         0x0000000008000bda        0x2 
+                0x0000000008000bdc        0x2 ./Startup/startup_stm32f091rctx.o
+                0x0000000008000bdc                DMA1_CH4_5_6_7_DMA2_CH3_4_5_IRQHandler
+                0x0000000008000bdc                TIM1_CC_IRQHandler
+                0x0000000008000bdc                TSC_IRQHandler
+                0x0000000008000bdc                HardFault_Handler
+                0x0000000008000bdc                SysTick_Handler
+                0x0000000008000bdc                PVD_IRQHandler
+                0x0000000008000bdc                PendSV_Handler
+                0x0000000008000bdc                NMI_Handler
+                0x0000000008000bdc                RCC_CRS_IRQHandler
+                0x0000000008000bdc                TIM6_DAC_IRQHandler
+                0x0000000008000bdc                I2C2_IRQHandler
+                0x0000000008000bdc                TIM17_IRQHandler
+                0x0000000008000bdc                CEC_CAN_IRQHandler
+                0x0000000008000bdc                RTC_IRQHandler
+                0x0000000008000bdc                TIM16_IRQHandler
+                0x0000000008000bdc                TIM3_IRQHandler
+                0x0000000008000bdc                Default_Handler
+                0x0000000008000bdc                DMA1_CH2_3_DMA2_CH1_2_IRQHandler
+                0x0000000008000bdc                TIM14_IRQHandler
+                0x0000000008000bdc                TIM15_IRQHandler
+                0x0000000008000bdc                EXTI0_1_IRQHandler
+                0x0000000008000bdc                USB_IRQHandler
+                0x0000000008000bdc                SPI2_IRQHandler
+                0x0000000008000bdc                DMA1_CH1_IRQHandler
+                0x0000000008000bdc                SVC_Handler
+                0x0000000008000bdc                WWDG_IRQHandler
+                0x0000000008000bdc                TIM2_IRQHandler
+                0x0000000008000bdc                ADC_COMP_IRQHandler
+                0x0000000008000bdc                USART2_IRQHandler
+                0x0000000008000bdc                USART3_4_5_6_7_8_IRQHandler
+                0x0000000008000bdc                FLASH_IRQHandler
+                0x0000000008000bdc                USART1_IRQHandler
+                0x0000000008000bdc                TIM1_BRK_UP_TRG_COM_IRQHandler
+ *fill*         0x0000000008000bde        0x2 
  .text.BasicTimer_ClockControl
-                0x0000000008000bdc       0x88 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000bdc                BasicTimer_ClockControl
+                0x0000000008000be0       0x88 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000be0                BasicTimer_ClockControl
  .text.BasicTimer_Init
-                0x0000000008000c64       0x8e ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000c64                BasicTimer_Init
+                0x0000000008000c68       0x8e ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000c68                BasicTimer_Init
  .text.BasicTimer_EnableDisable
-                0x0000000008000cf2       0x60 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000cf2                BasicTimer_EnableDisable
+                0x0000000008000cf6       0x60 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000cf6                BasicTimer_EnableDisable
  .text.BasicTimer_GetCounter
-                0x0000000008000d52       0x18 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000d52                BasicTimer_GetCounter
+                0x0000000008000d56       0x18 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000d56                BasicTimer_GetCounter
  .text.BasicTimer_RestartCounter
-                0x0000000008000d6a       0x20 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000d6a                BasicTimer_RestartCounter
- *fill*         0x0000000008000d8a        0x2 
+                0x0000000008000d6e       0x20 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000d6e                BasicTimer_RestartCounter
+ *fill*         0x0000000008000d8e        0x2 
  .text.BasicTimer_IRQ_EnableDisable
-                0x0000000008000d8c       0x58 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000d8c                BasicTimer_IRQ_EnableDisable
+                0x0000000008000d90       0x58 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000d90                BasicTimer_IRQ_EnableDisable
  .text.BasicTimer_IRQ_Handling
-                0x0000000008000de4       0x48 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000de4                BasicTimer_IRQ_Handling
+                0x0000000008000de8       0x48 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000de8                BasicTimer_IRQ_Handling
  .text.VirtualBasicTimer_Elapsed
-                0x0000000008000e2c       0x82 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000e2c                VirtualBasicTimer_Elapsed
+                0x0000000008000e30       0x82 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000e30                VirtualBasicTimer_Elapsed
  .text.VirtualBasicTimer_EnableDisable
-                0x0000000008000eae       0x2c ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000eae                VirtualBasicTimer_EnableDisable
+                0x0000000008000eb2       0x2c ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000eb2                VirtualBasicTimer_EnableDisable
  .text.VirtualBasicTimer_StartCounter
-                0x0000000008000eda       0x28 ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000eda                VirtualBasicTimer_StartCounter
+                0x0000000008000ede       0x28 ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000ede                VirtualBasicTimer_StartCounter
  .text.VirtualBasicTimer_StopCounter
-                0x0000000008000f02       0x2a ./myDrivers/SrcDrivers/basicTimers.o
-                0x0000000008000f02                VirtualBasicTimer_StopCounter
+                0x0000000008000f06       0x2a ./myDrivers/SrcDrivers/basicTimers.o
+                0x0000000008000f06                VirtualBasicTimer_StopCounter
  .text.GPIO_ClockControl
-                0x0000000008000f2c      0x164 ./myDrivers/SrcDrivers/gpio.o
-                0x0000000008000f2c                GPIO_ClockControl
+                0x0000000008000f30      0x164 ./myDrivers/SrcDrivers/gpio.o
+                0x0000000008000f30                GPIO_ClockControl
  .text.GPIO_PinInit
-                0x0000000008001090      0x31c ./myDrivers/SrcDrivers/gpio.o
-                0x0000000008001090                GPIO_PinInit
+                0x0000000008001094      0x31c ./myDrivers/SrcDrivers/gpio.o
+                0x0000000008001094                GPIO_PinInit
  .text.GPIO_WritePin
-                0x00000000080013ac       0x54 ./myDrivers/SrcDrivers/gpio.o
-                0x00000000080013ac                GPIO_WritePin
+                0x00000000080013b0       0x54 ./myDrivers/SrcDrivers/gpio.o
+                0x00000000080013b0                GPIO_WritePin
  .text.GPIO_IRQ_EnableDisable
-                0x0000000008001400       0x58 ./myDrivers/SrcDrivers/gpio.o
-                0x0000000008001400                GPIO_IRQ_EnableDisable
+                0x0000000008001404       0x58 ./myDrivers/SrcDrivers/gpio.o
+                0x0000000008001404                GPIO_IRQ_EnableDisable
  .text.GPIO_IRQ_Handling
-                0x0000000008001458       0x40 ./myDrivers/SrcDrivers/gpio.o
-                0x0000000008001458                GPIO_IRQ_Handling
+                0x000000000800145c       0x40 ./myDrivers/SrcDrivers/gpio.o
+                0x000000000800145c                GPIO_IRQ_Handling
  .text.I2C_ClockControl
-                0x0000000008001498       0x94 ./myDrivers/SrcDrivers/i2c.o
-                0x0000000008001498                I2C_ClockControl
+                0x000000000800149c       0x94 ./myDrivers/SrcDrivers/i2c.o
+                0x000000000800149c                I2C_ClockControl
  .text.I2C_Init
-                0x000000000800152c       0x24 ./myDrivers/SrcDrivers/i2c.o
-                0x000000000800152c                I2C_Init
+                0x0000000008001530       0x24 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001530                I2C_Init
  .text.I2C_EnableDisable
-                0x0000000008001550       0x46 ./myDrivers/SrcDrivers/i2c.o
-                0x0000000008001550                I2C_EnableDisable
- *fill*         0x0000000008001596        0x2 
+                0x0000000008001554       0x46 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001554                I2C_EnableDisable
+ *fill*         0x000000000800159a        0x2 
  .text.I2C_IRQ_EnableDisable
-                0x0000000008001598       0x58 ./myDrivers/SrcDrivers/i2c.o
-                0x0000000008001598                I2C_IRQ_EnableDisable
+                0x000000000800159c       0x58 ./myDrivers/SrcDrivers/i2c.o
+                0x000000000800159c                I2C_IRQ_EnableDisable
  .text.I2C_IRQ_Handling
-                0x00000000080015f0       0xdc ./myDrivers/SrcDrivers/i2c.o
-                0x00000000080015f0                I2C_IRQ_Handling
+                0x00000000080015f4       0xdc ./myDrivers/SrcDrivers/i2c.o
+                0x00000000080015f4                I2C_IRQ_Handling
  .text.I2C_SlaveAddress
-                0x00000000080016cc       0x4a ./myDrivers/SrcDrivers/i2c.o
- *fill*         0x0000000008001716        0x2 
+                0x00000000080016d0       0x4a ./myDrivers/SrcDrivers/i2c.o
+ *fill*         0x000000000800171a        0x2 
  .text.I2C_Master_Transmitter
-                0x0000000008001718      0x134 ./myDrivers/SrcDrivers/i2c.o
-                0x0000000008001718                I2C_Master_Transmitter
+                0x000000000800171c      0x134 ./myDrivers/SrcDrivers/i2c.o
+                0x000000000800171c                I2C_Master_Transmitter
  .text.I2C_Master_Receiver
-                0x000000000800184c      0x130 ./myDrivers/SrcDrivers/i2c.o
-                0x000000000800184c                I2C_Master_Receiver
+                0x0000000008001850      0x130 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001850                I2C_Master_Receiver
  .text.I2C_TXIS_handler
-                0x000000000800197c       0x46 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001980       0x46 ./myDrivers/SrcDrivers/i2c.o
  .text.I2C_RXNE_handler
-                0x00000000080019c2       0x52 ./myDrivers/SrcDrivers/i2c.o
+                0x00000000080019c6       0x52 ./myDrivers/SrcDrivers/i2c.o
  .text.I2C_BERR_handler
-                0x0000000008001a14       0x36 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001a18       0x36 ./myDrivers/SrcDrivers/i2c.o
  .text.I2C_STOP_handler
-                0x0000000008001a4a       0x30 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001a4e       0x30 ./myDrivers/SrcDrivers/i2c.o
  .text.I2C_TC_handler
-                0x0000000008001a7a       0x28 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001a7e       0x28 ./myDrivers/SrcDrivers/i2c.o
  .text.I2C_TCR_handler
-                0x0000000008001aa2       0x28 ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001aa6       0x28 ./myDrivers/SrcDrivers/i2c.o
  .text.I2C_Master_TimingR
-                0x0000000008001aca       0x8a ./myDrivers/SrcDrivers/i2c.o
-                0x0000000008001aca                I2C_Master_TimingR
+                0x0000000008001ace       0x8a ./myDrivers/SrcDrivers/i2c.o
+                0x0000000008001ace                I2C_Master_TimingR
  .text.SPI_ClockControl
-                0x0000000008001b54       0x94 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001b54                SPI_ClockControl
+                0x0000000008001b58       0x94 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001b58                SPI_ClockControl
  .text.SPI_Init
-                0x0000000008001be8      0x14c ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001be8                SPI_Init
+                0x0000000008001bec      0x14c ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001bec                SPI_Init
  .text.SPI_EnableDisable
-                0x0000000008001d34       0x40 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001d34                SPI_EnableDisable
+                0x0000000008001d38       0x40 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001d38                SPI_EnableDisable
  .text.SPI_SSOE
-                0x0000000008001d74       0x40 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001d74                SPI_SSOE
+                0x0000000008001d78       0x40 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001d78                SPI_SSOE
  .text.SPI_IRQ_EnableDisable
-                0x0000000008001db4       0x58 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001db4                SPI_IRQ_EnableDisable
+                0x0000000008001db8       0x58 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001db8                SPI_IRQ_EnableDisable
  .text.SPI_IRQ_Handling
-                0x0000000008001e0c       0x70 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001e0c                SPI_IRQ_Handling
+                0x0000000008001e10       0x70 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001e10                SPI_IRQ_Handling
  .text.SPI_TXE_handler
-                0x0000000008001e7c       0x92 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001e80       0x92 ./myDrivers/SrcDrivers/spi.o
  .text.SPI_RXNE_handler
-                0x0000000008001f0e       0x96 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001f12       0x96 ./myDrivers/SrcDrivers/spi.o
  .text.SPI_OVR_handler
-                0x0000000008001fa4       0x32 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001fa8       0x32 ./myDrivers/SrcDrivers/spi.o
  .text.SPI_Send
-                0x0000000008001fd6       0x3e ./myDrivers/SrcDrivers/spi.o
-                0x0000000008001fd6                SPI_Send
+                0x0000000008001fda       0x3e ./myDrivers/SrcDrivers/spi.o
+                0x0000000008001fda                SPI_Send
  .text.SPI_Read
-                0x0000000008002014       0x42 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008002014                SPI_Read
+                0x0000000008002018       0x42 ./myDrivers/SrcDrivers/spi.o
+                0x0000000008002018                SPI_Read
  .text.SPI_App_Callback
-                0x0000000008002056       0x16 ./myDrivers/SrcDrivers/spi.o
-                0x0000000008002056                SPI_App_Callback
+                0x000000000800205a       0x16 ./myDrivers/SrcDrivers/spi.o
+                0x000000000800205a                SPI_App_Callback
  .text.__libc_init_array
-                0x000000000800206c       0x48 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-init.o)
-                0x000000000800206c                __libc_init_array
- .text.memset   0x00000000080020b4       0x10 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-memset.o)
-                0x00000000080020b4                memset
- .text.strlcpy  0x00000000080020c4       0x4c /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-strlcpy.o)
-                0x00000000080020c4                strlcpy
- .text.strncat  0x0000000008002110       0x2a /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-strncat.o)
-                0x0000000008002110                strncat
+                0x0000000008002070       0x48 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-init.o)
+                0x0000000008002070                __libc_init_array
+ .text.memset   0x00000000080020b8       0x10 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-memset.o)
+                0x00000000080020b8                memset
+ .text.strlcpy  0x00000000080020c8       0x4c /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-strlcpy.o)
+                0x00000000080020c8                strlcpy
+ .text.strncat  0x0000000008002114       0x2a /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc_nano.a(lib_a-strncat.o)
+                0x0000000008002114                strncat
  *(.glue_7)
- .glue_7        0x000000000800213a        0x0 linker stubs
+ .glue_7        0x000000000800213e        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x000000000800213a        0x0 linker stubs
+ .glue_7t       0x000000000800213e        0x0 linker stubs
  *(.eh_frame)
- *fill*         0x000000000800213a        0x2 
- .eh_frame      0x000000000800213c        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
+ *fill*         0x000000000800213e        0x2 
+ .eh_frame      0x0000000008002140        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
  *(.init)
- .init          0x000000000800213c        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crti.o
-                0x000000000800213c                _init
- .init          0x0000000008002140        0x8 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtn.o
+ .init          0x0000000008002140        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crti.o
+                0x0000000008002140                _init
+ .init          0x0000000008002144        0x8 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtn.o
  *(.fini)
- .fini          0x0000000008002148        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crti.o
-                0x0000000008002148                _fini
- .fini          0x000000000800214c        0x8 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtn.o
-                0x0000000008002154                . = ALIGN (0x4)
-                0x0000000008002154                _etext = .
+ .fini          0x000000000800214c        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crti.o
+                0x000000000800214c                _fini
+ .fini          0x0000000008002150        0x8 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtn.o
+                0x0000000008002158                . = ALIGN (0x4)
+                0x0000000008002158                _etext = .
 
-.vfp11_veneer   0x0000000008002154        0x0
- .vfp11_veneer  0x0000000008002154        0x0 linker stubs
+.vfp11_veneer   0x0000000008002158        0x0
+ .vfp11_veneer  0x0000000008002158        0x0 linker stubs
 
-.v4_bx          0x0000000008002154        0x0
- .v4_bx         0x0000000008002154        0x0 linker stubs
+.v4_bx          0x0000000008002158        0x0
+ .v4_bx         0x0000000008002158        0x0 linker stubs
 
-.iplt           0x0000000008002154        0x0
- .iplt          0x0000000008002154        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
+.iplt           0x0000000008002158        0x0
+ .iplt          0x0000000008002158        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
 
-.rodata         0x0000000008002154       0x4c
-                0x0000000008002154                . = ALIGN (0x4)
+.rodata         0x0000000008002158       0x4c
+                0x0000000008002158                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0000000008002154       0x26 ./Src/train_LCD_timers.o
+ .rodata        0x0000000008002158       0x26 ./Src/train_LCD_timers.o
  *(.rodata*)
- *fill*         0x000000000800217a        0x2 
+ *fill*         0x000000000800217e        0x2 
  .rodata.spi_appComm
-                0x000000000800217c       0x24 ./Src/train_LCD_timers.o
-                0x00000000080021a0                . = ALIGN (0x4)
+                0x0000000008002180       0x24 ./Src/train_LCD_timers.o
+                0x00000000080021a4                . = ALIGN (0x4)
 
-.rel.dyn        0x00000000080021a0        0x0
- .rel.iplt      0x00000000080021a0        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
+.rel.dyn        0x00000000080021a4        0x0
+ .rel.iplt      0x00000000080021a4        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
 
-.ARM.extab      0x00000000080021a0        0x0
-                0x00000000080021a0                . = ALIGN (0x4)
+.ARM.extab      0x00000000080021a4        0x0
+                0x00000000080021a4                . = ALIGN (0x4)
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x00000000080021a0                . = ALIGN (0x4)
+                0x00000000080021a4                . = ALIGN (0x4)
 
-.ARM            0x00000000080021a0        0x0
-                0x00000000080021a0                . = ALIGN (0x4)
-                0x00000000080021a0                __exidx_start = .
+.ARM            0x00000000080021a4        0x0
+                0x00000000080021a4                . = ALIGN (0x4)
+                0x00000000080021a4                __exidx_start = .
  *(.ARM.exidx*)
-                0x00000000080021a0                __exidx_end = .
-                0x00000000080021a0                . = ALIGN (0x4)
+                0x00000000080021a4                __exidx_end = .
+                0x00000000080021a4                . = ALIGN (0x4)
 
-.preinit_array  0x00000000080021a0        0x0
-                0x00000000080021a0                . = ALIGN (0x4)
-                0x00000000080021a0                PROVIDE (__preinit_array_start = .)
+.preinit_array  0x00000000080021a4        0x0
+                0x00000000080021a4                . = ALIGN (0x4)
+                0x00000000080021a4                PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x00000000080021a0                PROVIDE (__preinit_array_end = .)
-                0x00000000080021a0                . = ALIGN (0x4)
+                0x00000000080021a4                PROVIDE (__preinit_array_end = .)
+                0x00000000080021a4                . = ALIGN (0x4)
 
-.init_array     0x00000000080021a0        0x4
-                0x00000000080021a0                . = ALIGN (0x4)
-                0x00000000080021a0                PROVIDE (__init_array_start = .)
+.init_array     0x00000000080021a4        0x4
+                0x00000000080021a4                . = ALIGN (0x4)
+                0x00000000080021a4                PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array*)
- .init_array    0x00000000080021a0        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
-                0x00000000080021a4                PROVIDE (__init_array_end = .)
-                0x00000000080021a4                . = ALIGN (0x4)
+ .init_array    0x00000000080021a4        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
+                0x00000000080021a8                PROVIDE (__init_array_end = .)
+                0x00000000080021a8                . = ALIGN (0x4)
 
-.fini_array     0x00000000080021a4        0x4
-                0x00000000080021a4                . = ALIGN (0x4)
+.fini_array     0x00000000080021a8        0x4
+                0x00000000080021a8                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x00000000080021a4        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
+ .fini_array    0x00000000080021a8        0x4 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
-                0x00000000080021a8                . = ALIGN (0x4)
-                0x00000000080021a8                _sidata = LOADADDR (.data)
+                0x00000000080021ac                . = ALIGN (0x4)
+                0x00000000080021ac                _sidata = LOADADDR (.data)
 
-.data           0x0000000020000000       0x1c load address 0x00000000080021a8
+.data           0x0000000020000000       0x1c load address 0x00000000080021ac
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _sdata = .
  *(.data)
@@ -1053,11 +1053,11 @@ LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.extern
  *fill*         0x0000000020000019        0x3 
                 0x000000002000001c                _edata = .
 
-.igot.plt       0x000000002000001c        0x0 load address 0x00000000080021c4
+.igot.plt       0x000000002000001c        0x0 load address 0x00000000080021c8
  .igot.plt      0x000000002000001c        0x0 /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
                 0x000000002000001c                . = ALIGN (0x4)
 
-.bss            0x000000002000001c       0xf0 load address 0x00000000080021c4
+.bss            0x000000002000001c       0xf0 load address 0x00000000080021c8
                 0x000000002000001c                _sbss = .
                 0x000000002000001c                __bss_start__ = _sbss
  *(.bss)
@@ -1127,7 +1127,7 @@ LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.extern
                 0x000000002000010c                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x000000002000010c      0x604 load address 0x00000000080021c4
+                0x000000002000010c      0x604 load address 0x00000000080021c8
                 0x0000000020000110                . = ALIGN (0x8)
  *fill*         0x000000002000010c        0x4 
                 0x0000000020000110                PROVIDE (end = .)
@@ -1180,13 +1180,13 @@ LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.extern
 LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 LOAD /home/danimt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a
 
-.debug_info     0x0000000000000000     0x2a5d
- .debug_info    0x0000000000000000      0xf34 ./Src/train_LCD_timers.o
- .debug_info    0x0000000000000f34       0x22 ./Startup/startup_stm32f091rctx.o
- .debug_info    0x0000000000000f56      0x6a6 ./myDrivers/SrcDrivers/basicTimers.o
- .debug_info    0x00000000000015fc      0x607 ./myDrivers/SrcDrivers/gpio.o
- .debug_info    0x0000000000001c03      0x774 ./myDrivers/SrcDrivers/i2c.o
- .debug_info    0x0000000000002377      0x6e6 ./myDrivers/SrcDrivers/spi.o
+.debug_info     0x0000000000000000     0x2a4c
+ .debug_info    0x0000000000000000      0xf2e ./Src/train_LCD_timers.o
+ .debug_info    0x0000000000000f2e       0x22 ./Startup/startup_stm32f091rctx.o
+ .debug_info    0x0000000000000f50      0x6a6 ./myDrivers/SrcDrivers/basicTimers.o
+ .debug_info    0x00000000000015f6      0x607 ./myDrivers/SrcDrivers/gpio.o
+ .debug_info    0x0000000000001bfd      0x774 ./myDrivers/SrcDrivers/i2c.o
+ .debug_info    0x0000000000002371      0x6db ./myDrivers/SrcDrivers/spi.o
 
 .debug_abbrev   0x0000000000000000      0x809
  .debug_abbrev  0x0000000000000000      0x240 ./Src/train_LCD_timers.o

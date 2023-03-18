@@ -38,6 +38,7 @@ typedef struct {
 	MEF_Action During; //what to do during the state
 	MEF_Action onExit; //what to do just before exiting the state
 	uint8_t numberTransitions;
+	MEF_Transition *arrayTransitions;
 }MEF_State; //state of an MEF
 typedef struct {
 	volatile uint8_t MEF_Active; //if MEF is active or not
@@ -45,7 +46,7 @@ typedef struct {
 	uint8_t numberStates; //number of states of the MEF
 	volatile uint8_t flagStateChange; //if there has been a change of states
 	MEF_State *arrayStates;
-	MEF_Transition *arrayTransitions;
+	//moved to MEF_State: MEF_Transition *arrayTransitions;
 } MEF_MEF; //MEF
 
 /* USER CODE END PTD */
@@ -113,7 +114,30 @@ static void LCD_Arduino_task_handler (void *parameters);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+//Transitions
+MEF_Transition OFF_TRANSITIONS[NUMBER_TRANSITIONS_OFF] = {
+		  {evaluate_Event_Off_Off, OFF_STATE},
+		  {evaluate_Event_Off_to_On, ON_STATE},
+		  {evaluate_Event_Off_to_Emergency, EMERGENCY_STATE}
+};
+MEF_Transition ON_TRANSITIONS[NUMBER_TRANSITIONS_ON] = {
+		  {evaluate_Event_On_On, ON_STATE},
+		  {evaluate_Event_On_to_Off, OFF_STATE},
+		  {evaluate_Event_On_to_Emergency, EMERGENCY_STATE}
+};
+MEF_Transition EMERGENCY_TRANSITIONS[NUMBER_TRANSITIONS_EMERGENCY] = {
+		  {evaluate_Event_Emergency_Emergency, EMERGENCY_STATE},
+		  {evaluate_Event_Emergency_to_Off, OFF_STATE},
+		  {evaluate_Event_Emergency_to_On, ON_STATE}
+};
+//States
+MEF_State MEF1_STATES_ARRAY[NUMBER_STATES] = {
+		  {onEntry_Off, during_Off, onExit_Off, NUMBER_TRANSITIONS_OFF, OFF_TRANSITIONS},
+		  {onEntry_On, during_On, onExit_On, NUMBER_TRANSITIONS_ON}, ON_TRANSITIONS,
+		  {onEntry_Emergency, during_Emergency, onExit_Emergency, NUMBER_TRANSITIONS_EMERGENCY, EMERGENCY_TRANSITIONS}
+};
+//FSM instances
+MEF_MEF MEF1 = {FSM_ACTIVE, OFF_STATE, NUMBER_STATES, STATE_NOT_CHANGED, MEF1_STATES_ARRAY};
 /* USER CODE END 0 */
 
 /**
@@ -139,30 +163,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  //Transitions
-  MEF_Transition OFF_TRANSITIONS[NUMBER_TRANSITIONS_OFF] = {
-		  {evaluate_Event_Off_Off, OFF_STATE},
-		  {evaluate_Event_Off_to_On, ON_STATE},
-		  {evaluate_Event_Off_to_Emergency, EMERGENCY_STATE}
-  };
-  MEF_Transition ON_TRANSITIONS[NUMBER_TRANSITIONS_ON] = {
-		  {evaluate_Event_On_On, ON_STATE},
-		  {evaluate_Event_On_to_Off, OFF_STATE},
-		  {evaluate_Event_On_to_Emergency, EMERGENCY_STATE}
-  };
-  MEF_Transition EMERGENCY_TRANSITIONS[NUMBER_TRANSITIONS_EMERGENCY] = {
-		  {evaluate_Event_Emergency_Emergency, EMERGENCY_STATE},
-		  {evaluate_Event_Emergency_to_Off, OFF_STATE},
-		  {evaluate_Event_Emergency_to_On, ON_STATE}
-  };
-  //States
-  MEF_State MEF1_STATES_ARRAY[NUMBER_STATES] = {
-		  {onEntry_Off, during_Off, onExit_Off, NUMBER_TRANSITIONS_OFF},
-		  {onEntry_On, during_On, onExit_On, NUMBER_TRANSITIONS_ON},
-		  {onEntry_Emergency, during_Emergency, onExit_Emergency, NUMBER_TRANSITIONS_EMERGENCY}
-  };
-  //FSM instances
-  MEF_MEF MEF1 = {FSM_ACTIVE, OFF_STATE, NUMBER_STATES, STATE_NOT_CHANGED, OFF_TRANSITIONS, MEF1_STATES_ARRAY};
 
   /* USER CODE END Init */
 
@@ -184,6 +184,10 @@ int main(void)
   configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
   task_Status = xTaskCreate(LCD_Arduino_task_handler, "FSMcontrol", 200, NULL, 1, &LCD_Arduino_taskPointer);
   configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
+
+  //Start scheduler
+  vTaskStartScheduler();
+  //Code should not reach here. vTaskStartScheduler must have failed due to insufficient heap memory?
 
   /* USER CODE END 2 */
 
@@ -313,19 +317,57 @@ uint8_t evaluate_Event_Emergency_Emergency(){
 };
 /** Task handlers **/
 static void FSM_task_handler (void *parameters){
+	//only active if an interrupt from on/off or emergency stop button happens
+	static uint8_t *pState = MEF1->arrayStates;
+	static MEF_Transition *pT = pState[MEF1->currentState]->arrayTransitions;
+	uint8_t uiTrans;
+	for(;;){
+		//evaluate the state by iterating over the number of transitions of the current state
+		for (uiTrans = 0; uiTrans < pState[MEF1->currentState]->numberTransitions; uiTrans++){
+			if (pT[uiTrans]->Event() == TRUE){ //event true, transition activated
+				// execute exit function of the state
+				pState[MEF1->currentState].onExit();
+				//assign next state, update the MEF and execute entry/do actions
+				if (MEF1->currentState == pT[uiTrans]->nextState) { //flag state changed
+					MEF1->flagStateChange = STATE_CHANGED;
+					//entry action
+					MEF1->arrayStates[MEF1->currentState].onEntry();
+				}
+				else{
+					MEF1->flagStateChange = STATE_NOT_CHANGED;
+					//do action
+					MEF1->arrayStates[MEF1->currentState].During();
+				}
+				MEF1->currentState = pT[uiTrans]->nextState;
+			}
+		}
 
+	}
 }
 
 static void Motor_Control_task_handler (void *parameters){
+	//high priority if using real motor. if not real motor, based on SW timer
+	for(;;){
 
+	}
 }
 
 static void Read_Temperature_task_handler (void *parameters){
+	//high priority, periodic function
+	for(;;){
 
+	}
 }
 
 static void LCD_Arduino_task_handler (void *parameters){
 
+	for(;;){
+		//enable SPI
+
+		//send to Arduino: state + station + temperature
+
+		//disable SPI
+	}
 }
 
 /* USER CODE END 4 */

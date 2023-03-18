@@ -267,7 +267,7 @@ void SPI_Send(SPI_Handle_t *pSPIhandle, uint8_t *pTXbuffer, uint32_t length){
 		pSPIhandle->pSPI->SPI_CR2 |= (1 << SPI_CR2_TXEIE);//enable the TX interrupt to start transmission
 	}
 }
-void SPI_Read(SPI_Handle_t *pSPIhandle, volatile uint8_t *pRXbuffer, uint32_t length){
+void SPI_Read(SPI_Handle_t *pSPIhandle, uint8_t *pRXbuffer, uint32_t length){
 	//set RX state as busy (SPI_DURING_RX) and configure the reading process (DR fetches from RX buffer).
 	if (pSPIhandle->SPI_Comm.RX_state != SPI_DURING_RX){
 		pSPIhandle->SPI_Comm.RX_state = SPI_DURING_RX;

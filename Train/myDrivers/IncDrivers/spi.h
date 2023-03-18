@@ -128,7 +128,7 @@ void SPI_IRQ_Handling(SPI_Handle_t *pSPIhandle);
 
 /*Send or receive data (through interrupts, not polling) */
 void SPI_Send(SPI_Handle_t *pSPIhandle, uint8_t *pTXbuffer, uint32_t length);
-void SPI_Read(SPI_Handle_t *pSPIhandle, volatile uint8_t *pRXbuffer, uint32_t length);
+void SPI_Read(SPI_Handle_t *pSPIhandle, uint8_t *pRXbuffer, uint32_t length);
 
 /*Callback to application */
 void SPI_App_Callback(SPI_Handle_t *pSPIhandle,uint8_t Event);

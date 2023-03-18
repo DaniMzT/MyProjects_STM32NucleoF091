@@ -81,6 +81,20 @@ uint8_t SPI_SlaveReceive(void)
   
 }
 
+//This function receives a message of many bytes
+void SPI_SlaveReceive_Message(byte messLen){
+  for(int i=0 ; i < messLen ; i++)
+    {
+      //Serial.print(i);
+      //Serial.println(" byte position received:");
+      while(!(SPSR & (1<<SPIF)));
+      dataBuff[i] = SPSR;
+      //Serial.println(dataBuff[i]);
+      lcd.setCursor(i%(LCD_COLUMNS),i/LCD_COLUMNS); // Position the cursor where to write (column,row)
+      lcd.write(dataBuff[i]);
+      //in case of lack of synchronization,don't use setCursor or write here. Instead, lcd.setCursor(0,0) and lcd.write(dataBuff) after returning from here
+    }
+}
 
 //sends one byte of data 
 void SPI_SlaveTransmit(uint8_t data)
@@ -136,7 +150,7 @@ byte checkCommandPrint(byte inputcommand)
 // The loop function runs continuously after setup().
 void loop() 
 {
-  byte data,command,len,ackornack=NACK;
+  byte dataRec,len,ackornack=NACK;
   int i = 0;
   
   //1. fist make sure that ss is low . so lets wait until ss is low 
@@ -149,34 +163,26 @@ void loop()
   
   //2. now lets wait until rx buffer has a byte
   Serial.println("1.Received command");
-  command = SPI_SlaveReceive();
-  Serial.println(command);
-  ackornack = checkCommandPrint(command);
+  dataRec = SPI_SlaveReceive();
+  Serial.println(dataRec);
+  ackornack = checkCommandPrint(dataRec);
   
   Serial.println("2.command to be transmitted when dummy");
   Serial.println(ackornack);
   SPI_SlaveTransmit(ackornack);
   
   Serial.println("3.Received dummy");
-  data = SPI_SlaveReceive(); //dummy byte from STM32 so that ACK/NACK is sent
+  dataRec = SPI_SlaveReceive(); //dummy byte from STM32 so that ACK/NACK is sent
   //Serial.println(data);
   
-  if ( command == SPI_COMMAND_PRINT)
+  if ( dataRec == SPI_COMMAND_PRINT)
   {
     Serial.println("4.Received length");
     //uint8_t len = SPI_SlaveReceive(); 
     len = SPI_SlaveReceive();
     Serial.println(len);
     lcd.clear(); //clear the LCD screen (first time)
-    for(i=0 ; i < len ; i++)
-    {
-      Serial.print(i);
-      //Serial.println(" byte position received:");
-      dataBuff[i] = SPI_SlaveReceive();
-      //Serial.println(dataBuff[i]);
-      lcd.setCursor(i%(LCD_COLUMNS),i/LCD_COLUMNS); // Position the cursor where to write (column,row)
-      lcd.write(dataBuff[i]);
-    }
+    SPI_SlaveReceive_Message(len); //read all the message in this function rather than looping here,which delays time due to calls
     //lcd.print(dataBuff);
 
   }

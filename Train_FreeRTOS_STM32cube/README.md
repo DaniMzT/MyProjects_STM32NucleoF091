@@ -11,9 +11,10 @@ States:
 - Turn_Off
 - Emergency
 Tasks:
-- FSMcontrol (Moore's machine,output depends on the event).management of state, which is a parameter in many tasks. actions on entry/during/on exit as short as possible if can be delegated on tasks)
+- FSMcontrol (Moore's machine,output depends on the event).management of state, which is a parameter in many tasks. actions on entry/during/on exit as short as possible if can be delegated on tasks).
+Interrupts from on/off switches and emergency stop button preempt task FSMcontrol. These interrupts enable/disable some flags, which will be used to evaluate states.
 - Motor_Control (when motor available; otherwise, SW timer)
-- Read_Temperature
+- Read_Temperature (periodic)
 - Send_Arduino_SPI (depends on the state)
 - LEDs_control (depends on the state).It could be an on entry action of every state, but as it's common for the states I prefer to use it as a task
 
@@ -71,26 +72,4 @@ Interrupts:
 	portYIELD_FROM_ISR(), ensuring the ISR returns directly to Emergency task (read p201 manual, how to use xHigherPriorityTaskWoken)
 - Temperature sensor via ADC (I2C): less priority. Pushes back to temperature queue
 - Arduino communication for LCD (SPI): less priority
---
-TESTS
-- emergency, on, off tasks only run after interrupts, never periodically
-- simulate emergency stop during off or on tasks (make both long enough). emergency must take over them and on/off tasks not resumed afterwards.
-- simulate off/on during emergency task (make it long enough). on/off can't take over emergency
-
-IDEAS 
-Palancas emergencia, semaforos/señales stop externos
-Hacerlo robusto con manejo errores posibles. waitForever o timeout, depende de si repetir iteracion en caso de no obtener valor cola nos interesa o no. 
-Para mensajes comunicacion, no printf. ver opciones que explican primeros videos ( SWO SWV ITM data console con task_Action(solo STM32 CSIS?)...)
-Semaforo binario/mutex: acceso freno (emergencia?)/motor
-Semáforo contador: nºestación. avance derecha suma, avance izquierda resta. pensar también en algun recurso limitado. Hay alguna manera de saber valor contador semaforo y adquirir en base a un numero concreto? por ejemplo, que cuando semaforo==2, adquirir.
-algun event flag para que una tarea se ejecute tras una combinacion de eventos (de una interrupcion + otra tarea, p.ej).
-task notifications: habilitar motor o freno desde tareas, añadiendo motor y freno como mutex.
-
-SW interrupts:
-The syntax used to generate a software interrupt is dependent on the
-FreeRTOS port being used. The syntax used below can only be used with
-the FreeRTOS Windows port, in which such interrupts are only simulated. */
-vPrintString( "Periodic task - About to generate an interrupt.\r\n" );
-vPortGenerateSimulatedInterrupt( mainINTERRUPT_NUMBER );
-vPrintString( "Periodic task - Interrupt generated.\r\n\r\n\r\n" );
 

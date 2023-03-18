@@ -73,7 +73,7 @@ I2C_Handle_t i2c1;
 #define ADS1115_CONVERSION_REGISTER_BYTES 2
 
 //I2C related
-uint8_t restart_I2C = 1; //flag to enable/disable restart.Changed from callbacks
+volatile uint8_t restart_I2C = 1; //flag to enable/disable restart.Changed from callbacks
 uint16_t lastADS1115_raw = 0;
 uint16_t lastADS1115_mV = 0;
 #define ADS1115_GAIN 4076 //Gain amplifier in mV, check ADS1115 datasheet
@@ -82,7 +82,7 @@ uint8_t bytes_to_ADS1115_reg[3] = {0x00,0x00,0x00}; //for ADS1115 configuration 
 uint8_t bytes_from_ADS1115[2] = {0x00,0x00}; //data received from ADS1115 (conversion register)
 enum stateADS1115{ADS1115_NOT_STARTED,ADS1115_1ST_DURING,ADS1115_1ST_DONE,ADS1115_2ND_DURING,ADS1115_CONFIGURED};
 enum stateADS1115 flagADS1115 = ADS1115_NOT_STARTED;
-uint8_t startRX = 0; //boolean to know if START (Address+read bit) has been sent for receiving ADS1115
+volatile uint8_t startRX = 0; //boolean to know if START (Address+read bit) has been sent for receiving ADS1115
 /*uint16_t testCounter_measurements = 0;
 #define I2C_MAX_MEASUREMENTS	5 //limit of I2C measurements (testing) */
 
@@ -93,7 +93,7 @@ VirtualBasicTimer_t train_virtualTimer; //virtual timer simulating automatic tra
 //Related to the application
 enum state{OFF,ON,EMERGENCY};
 enum state currentState = OFF;
-uint8_t stateChanged = 0; //0 if the state changes; 1 if it changes
+volatile uint8_t stateChanged = 0; //0 if the state changes; 1 if it changes
 uint8_t trainStation = 0;
 enum train_directions {LEFT,RIGHT};
 enum train_directions trainDirection = RIGHT;
