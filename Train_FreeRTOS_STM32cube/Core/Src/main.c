@@ -75,7 +75,8 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t uiFlagOnOff = FALSE; //handled by ButtonOnOff_Pin interrupt handler. button with spring return, not switch
+uint8_t uiFlagEmergency = FALSE;//handled by EmergencyStopButton_Pin interrupt handler. button with spring return, not switch
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -249,15 +250,23 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED0_Pin|LED1_Pin|LED2_Pin|LED3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LED0_Pin LED1_Pin LED2_Pin LED3_Pin */
+  GPIO_InitStruct.Pin = LED0_Pin|LED1_Pin|LED2_Pin|LED3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : USART_TX_Pin USART_RX_Pin */
   GPIO_InitStruct.Pin = USART_TX_Pin|USART_RX_Pin;
@@ -267,12 +276,42 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF1_USART2;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  /*Configure GPIO pin : PA4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF0_SPI1;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PA5 PA6 PA7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF0_SPI1;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ButtonOnOff_Pin EmergencyStopButton_Pin */
+  GPIO_InitStruct.Pin = ButtonOnOff_Pin|EmergencyStopButton_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB6 PB9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 }
 
@@ -289,30 +328,71 @@ void during_Emergency(){};
 void onExit_Emergency(){};
 // Evaluate events for transitions
 uint8_t evaluate_Event_Off_to_On(){
+	if (uiFlagOnOff){
+		//clear flag
+		uiFlagOnOff = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_Off_to_Emergency(){
+	if (uiFlagEmergency){
+		//clear flag
+		uiFlagEmergency = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_Off_Off(){
+	if (!uiFlagOnOff){//no change
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_On_to_Off(){
+	if (uiFlagOnOff){
+		//clear flag
+		uiFlagOnOff = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_On_to_Emergency(){
+	if (uiFlagEmergency){
+		//clear flag
+		uiFlagEmergency = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_On_On(){
+	if (!uiFlagOnOff){ //no change
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_Emergency_to_Off(){
+	//considering that system can switch off in the middle of an emergency state
+	if (uiFlagEmergency && uiFlagOnOff){
+		//clear flags
+		uiFlagEmergency = FALSE;
+		uiFlagOnOff = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_Emergency_to_On(){
+	if (uiFlagEmergency){
+		//clear flag
+		uiFlagEmergency = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 };
 uint8_t evaluate_Event_Emergency_Emergency(){
+	if (!uiFlagEmergency){ //no change
+		return TRUE;
+	}
 	return FALSE;
 };
 /** Task handlers **/
@@ -367,6 +447,24 @@ static void LCD_Arduino_task_handler (void *parameters){
 		//send to Arduino: state + station + temperature
 
 		//disable SPI
+	}
+}
+
+//EXTI interrupt handler (OnOff button or emergency stop
+void HAL_GPIO_EXTI_Callback(GPIO_Pin){
+	//from OnOff button
+	if (GPIO_Pin == ButtonOnOff_Pin){
+		//set/reset flag
+		uiFlagOnOff = TRUE;
+		//notify task FSM
+
+	}
+	//from emergency stop
+	if (GPIO_Pin == EmergencyStopButton_Pin){
+		//set/reset flag
+		uiFlagEmergency = TRUE;
+		//notify task FSM
+
 	}
 }
 
