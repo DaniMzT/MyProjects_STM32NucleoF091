@@ -1,6 +1,5 @@
-../ThirdParty/FreeRTOS/timers.c:233:16:xTimerCreateTimerTask	48	static,ignoring_inline_asm
+../ThirdParty/FreeRTOS/timers.c:233:16:xTimerCreateTimerTask	24	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:288:23:xTimerCreate	48	static
-../ThirdParty/FreeRTOS/timers.c:315:23:xTimerCreateStatic	48	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:355:17:prvInitialiseNewTimer	24	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:386:16:xTimerGenericCommand	56	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:433:18:xTimerGetTimerDaemonTaskHandle	8	static,ignoring_inline_asm
@@ -19,7 +18,7 @@
 ../ThirdParty/FreeRTOS/timers.c:716:23:prvInsertTimerInActiveList	32	static
 ../ThirdParty/FreeRTOS/timers.c:760:17:prvProcessReceivedCommands	40	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:908:17:prvSwitchTimerLists	16	static
-../ThirdParty/FreeRTOS/timers.c:933:17:prvCheckForValidListAndQueue	16	static
+../ThirdParty/FreeRTOS/timers.c:933:17:prvCheckForValidListAndQueue	8	static
 ../ThirdParty/FreeRTOS/timers.c:984:16:xTimerIsTimerActive	24	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:1009:12:pvTimerGetTimerID	24	static,ignoring_inline_asm
 ../ThirdParty/FreeRTOS/timers.c:1026:10:vTimerSetTimerID	24	static,ignoring_inline_asm

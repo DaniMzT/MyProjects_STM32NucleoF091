@@ -31,7 +31,13 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "FreeRTOS.h"
+#include "task.h"
+/*for printf*/
+#include <stdio.h>
 
+#include "queue.h"
+#include "event_groups.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -60,18 +66,16 @@ void Error_Handler(void);
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
 #define B1_EXTI_IRQn EXTI4_15_IRQn
-#define LED0_Pin GPIO_PIN_0
-#define LED0_GPIO_Port GPIOA
-#define LED1_Pin GPIO_PIN_1
-#define LED1_GPIO_Port GPIOA
+#define LED_Green_Pin GPIO_PIN_0
+#define LED_Green_GPIO_Port GPIOA
+#define LED_Blue_Pin GPIO_PIN_1
+#define LED_Blue_GPIO_Port GPIOA
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
-#define LED2_Pin GPIO_PIN_9
-#define LED2_GPIO_Port GPIOA
-#define LED3_Pin GPIO_PIN_10
-#define LED3_GPIO_Port GPIOA
+#define LED_Red_Pin GPIO_PIN_9
+#define LED_Red_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14

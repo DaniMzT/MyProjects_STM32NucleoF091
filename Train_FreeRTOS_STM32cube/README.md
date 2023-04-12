@@ -15,7 +15,7 @@ Tasks:
 Interrupts from on/off switches and emergency stop button preempt task FSMcontrol. These interrupts enable/disable some flags, which will be used to evaluate states.
 - Motor_Control (when motor available; otherwise, SW timer)
 - Read_Temperature (periodic)
-- Send_Arduino_SPI (depends on the state)
+- Send_Arduino_SPI (active only if a bit of the next event group is active: state changed/new station/speed change)
 - LEDs_control (depends on the state).It could be an on entry action of every state, but as it's common for the states I prefer to use it as a task
 
 APPROACH WITHOUT FSM

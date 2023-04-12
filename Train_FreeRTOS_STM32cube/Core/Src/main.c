@@ -21,8 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "FreeRTOS.h"
-#include "task.h"
+
 
 /* USER CODE END Includes */
 
@@ -73,15 +72,18 @@ typedef struct {
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 uint8_t uiFlagOnOff = FALSE; //handled by ButtonOnOff_Pin interrupt handler. button with spring return, not switch
 uint8_t uiFlagEmergency = FALSE;//handled by EmergencyStopButton_Pin interrupt handler. button with spring return, not switch
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 /** FSM functions **/
 // Related to states: onEntry, during, onExit
@@ -111,6 +113,36 @@ static void Motor_Control_task_handler (void *parameters);
 static void Read_Temperature_task_handler (void *parameters);
 static void LCD_Arduino_task_handler (void *parameters);
 
+//Task handles, I call them pointers to avoid confussion with handlers (which are functions)
+TaskHandle_t FSM_taskPointer;
+TaskHandle_t Motor_Control_taskPointer;
+TaskHandle_t Read_Temperature_taskPointer;
+TaskHandle_t LCD_Arduino_taskPointer;
+
+/*For the usage of printf via HAL_UART_Transmit*/
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
+
+PUTCHAR_PROTOTYPE
+{
+  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  return ch;
+}
+
+//Group of event flags (bits) for the LCD_Arduino task
+#define FLAG_STATUS_CHANGED (1<<0)
+#define FLAG_STATION_CHANGED (1<<1)
+#define FLAG_SPEED_CHANGED (1<<2)
+EventGroupHandle_t xGroupFlagsLCDArduino;
+EventBits_t uxBitsFlagsLCDArduino;
+
+//Temperature queue. Receive an item from a queue. The item is received by copy so a buffer of adequate size must be provided.
+QueueHandle_t xQueue_Temperature = NULL;
+uint16_t uiBuffer_QueueTemperature;
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -134,7 +166,7 @@ MEF_Transition EMERGENCY_TRANSITIONS[NUMBER_TRANSITIONS_EMERGENCY] = {
 //States
 MEF_State MEF1_STATES_ARRAY[NUMBER_STATES] = {
 		  {onEntry_Off, during_Off, onExit_Off, NUMBER_TRANSITIONS_OFF, OFF_TRANSITIONS},
-		  {onEntry_On, during_On, onExit_On, NUMBER_TRANSITIONS_ON}, ON_TRANSITIONS,
+		  {onEntry_On, during_On, onExit_On, NUMBER_TRANSITIONS_ON, ON_TRANSITIONS},
 		  {onEntry_Emergency, during_Emergency, onExit_Emergency, NUMBER_TRANSITIONS_EMERGENCY, EMERGENCY_TRANSITIONS}
 };
 //FSM instances
@@ -148,13 +180,13 @@ MEF_MEF MEF1 = {FSM_ACTIVE, OFF_STATE, NUMBER_STATES, STATE_NOT_CHANGED, MEF1_ST
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	//Task handles, I call them pointers to avoid confussion with handlers (which are functions)
-	TaskHandle_t FSM_taskPointer;
-	TaskHandle_t Motor_Control_taskPointer;
-	TaskHandle_t Read_Temperature_taskPointer;
-	TaskHandle_t LCD_Arduino_taskPointer;
-	//Status from tasks (BaseType_t is the most efficient data type for the architecture;i.e.:32-bit for 32-bit architecture)
-	BaseType_t task_Status;
+  //Status from tasks (BaseType_t is the most efficient data type for the architecture;i.e.:32-bit for 32-bit architecture)
+  BaseType_t task_Status;
+  //Event of flags for LCD Arduino task
+  xGroupFlagsLCDArduino = xEventGroupCreate();
+  if (xGroupFlagsLCDArduino == NULL){
+	  printf("Not possible to create xFlagsLCDArduino event group \n");
+  }
 
   /* USER CODE END 1 */
 
@@ -176,14 +208,27 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  task_Status = xTaskCreate(FSM_task_handler, "FSMcontrol", 200, NULL, 2, &FSM_taskPointer);
+  //I decide to set priorities higher than tskIDLE_PRIORITY.
+  //FSM control highest prio as I want that OnOff/Emergency interrupts wakes the task
+  task_Status = xTaskCreate(FSM_task_handler, "FSMcontrol", 200, NULL, tskIDLE_PRIORITY+2, &FSM_taskPointer);
   configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
-  task_Status = xTaskCreate(Motor_Control_task_handler, "FSMcontrol", 200, NULL, 3, &Motor_Control_taskPointer);
+
+  task_Status = xTaskCreate(Motor_Control_task_handler, "MotorControl", 200, NULL, tskIDLE_PRIORITY+1, &Motor_Control_taskPointer);
   configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
-  task_Status = xTaskCreate(Read_Temperature_task_handler, "FSMcontrol", 200, NULL, 2, &Read_Temperature_taskPointer);
-  configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
-  task_Status = xTaskCreate(LCD_Arduino_task_handler, "FSMcontrol", 200, NULL, 1, &LCD_Arduino_taskPointer);
+
+  //Create queue for reading temperature. if the queue is not created, do not create the task
+  xQueue_Temperature = xQueueCreate(5, sizeof(uint16_t));
+  if (xQueue_Temperature != NULL){
+	  task_Status = xTaskCreate(Read_Temperature_task_handler, "ReadTemperature", 200, NULL, tskIDLE_PRIORITY+1, &Read_Temperature_taskPointer);
+	  configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
+  }
+  else{
+	  printf("xQueue_Temperature failed to be created \n");
+  }
+
+  task_Status = xTaskCreate(LCD_Arduino_task_handler, "LCDArduino", 200, NULL, tskIDLE_PRIORITY+1, &LCD_Arduino_taskPointer);
   configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
 
   //Start scheduler
@@ -211,6 +256,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -235,6 +281,47 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
 }
 
 /**
@@ -253,7 +340,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED0_Pin|LED1_Pin|LED2_Pin|LED3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_Green_Pin|LED_Blue_Pin|LED_Red_Pin|GPIO_PIN_10, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -261,19 +348,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED0_Pin LED1_Pin LED2_Pin LED3_Pin */
-  GPIO_InitStruct.Pin = LED0_Pin|LED1_Pin|LED2_Pin|LED3_Pin;
+  /*Configure GPIO pins : LED_Green_Pin LED_Blue_Pin LED_Red_Pin PA10 */
+  GPIO_InitStruct.Pin = LED_Green_Pin|LED_Blue_Pin|LED_Red_Pin|GPIO_PIN_10;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : USART_TX_Pin USART_RX_Pin */
-  GPIO_InitStruct.Pin = USART_TX_Pin|USART_RX_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF1_USART2;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PA4 */
@@ -317,24 +396,39 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 // Related to states: onEntry, during, onExit
-void onEntry_Off(){};
-void during_Off(){};
-void onExit_Off(){};
-void onEntry_On(){};
-void during_On(){};
-void onExit_On(){};
-void onEntry_Emergency(){};
-void during_Emergency(){};
-void onExit_Emergency(){};
+void onEntry_Off(){
+	//turn on blue LED, turn off the rest
+	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, GPIO_PIN_RESET);
+}
+void during_Off(){}
+void onExit_Off(){}
+void onEntry_On(){
+	//turn on green LED, turn off the rest
+	HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+}
+void during_On(){}
+void onExit_On(){}
+void onEntry_Emergency(){
+	//turn on red LED, turn off the rest
+	HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+}
+void during_Emergency(){}
+void onExit_Emergency(){}
 // Evaluate events for transitions
 uint8_t evaluate_Event_Off_to_On(){
-	if (uiFlagOnOff){
+	if (uiFlagOnOff && !uiFlagEmergency){
 		//clear flag
 		uiFlagOnOff = FALSE;
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_Off_to_Emergency(){
 	if (uiFlagEmergency){
 		//clear flag
@@ -342,21 +436,21 @@ uint8_t evaluate_Event_Off_to_Emergency(){
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_Off_Off(){
-	if (!uiFlagOnOff){//no change
+	if (!uiFlagOnOff && !uiFlagEmergency){//no change
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_On_to_Off(){
-	if (uiFlagOnOff){
+	if (uiFlagOnOff && !uiFlagEmergency){
 		//clear flag
 		uiFlagOnOff = FALSE;
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_On_to_Emergency(){
 	if (uiFlagEmergency){
 		//clear flag
@@ -364,15 +458,15 @@ uint8_t evaluate_Event_On_to_Emergency(){
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_On_On(){
-	if (!uiFlagOnOff){ //no change
+	if (!uiFlagOnOff && !uiFlagEmergency){ //no change
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_Emergency_to_Off(){
-	//considering that system can switch off in the middle of an emergency state
+	//to undo emergency state,emergency button has to be pressed again. system can switch off in the middle of an emergency state
 	if (uiFlagEmergency && uiFlagOnOff){
 		//clear flags
 		uiFlagEmergency = FALSE;
@@ -380,45 +474,59 @@ uint8_t evaluate_Event_Emergency_to_Off(){
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_Emergency_to_On(){
+	//to undo emergency state,emergency button has to be pressed again.
 	if (uiFlagEmergency){
 		//clear flag
 		uiFlagEmergency = FALSE;
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 uint8_t evaluate_Event_Emergency_Emergency(){
 	if (!uiFlagEmergency){ //no change
 		return TRUE;
 	}
 	return FALSE;
-};
+}
 /** Task handlers **/
 static void FSM_task_handler (void *parameters){
-	//only active if an interrupt from on/off or emergency stop button happens
-	static uint8_t *pState = MEF1->arrayStates;
-	static MEF_Transition *pT = pState[MEF1->currentState]->arrayTransitions;
+	//task sleeps until an interrupt from on/off or emergency stop button happens
+	//L-value not necessary <-- static uint32_t uiFSM_notification;
+
+	//don't do 'static MEF_State *pState = MEF1.arrayStates' because In old C objects with static storage duration have to be initialized with constant expressions (literal constants)
+	static MEF_State *pState; //initialization to NULL
+	static MEF_Transition *pT;
 	uint8_t uiTrans;
 	for(;;){
+		//waken up by a GPIO interrupt handler
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY); //uiFSM_notification = ... not necessary
+		//Print
+		printf("FSM\n");
+		pState = MEF1.arrayStates;
+		pT = pState[MEF1.currentState].arrayTransitions;
 		//evaluate the state by iterating over the number of transitions of the current state
-		for (uiTrans = 0; uiTrans < pState[MEF1->currentState]->numberTransitions; uiTrans++){
-			if (pT[uiTrans]->Event() == TRUE){ //event true, transition activated
+		for (uiTrans = 0; uiTrans < pState[MEF1.currentState].numberTransitions; uiTrans++){
+			if (pT[uiTrans].Event() == TRUE){ //event true, transition activated
 				// execute exit function of the state
-				pState[MEF1->currentState].onExit();
+				pState[MEF1.currentState].onExit();
 				//assign next state, update the MEF and execute entry/do actions
-				if (MEF1->currentState == pT[uiTrans]->nextState) { //flag state changed
-					MEF1->flagStateChange = STATE_CHANGED;
-					//entry action
-					MEF1->arrayStates[MEF1->currentState].onEntry();
+				if (MEF1.currentState != pT[uiTrans].nextState) { //flag state changed
+					MEF1.flagStateChange = STATE_CHANGED;
+					MEF1.currentState = pT[uiTrans].nextState;
+					//entry action of new state
+					MEF1.arrayStates[MEF1.currentState].onEntry();
 				}
 				else{
-					MEF1->flagStateChange = STATE_NOT_CHANGED;
+					MEF1.flagStateChange = STATE_NOT_CHANGED;
 					//do action
-					MEF1->arrayStates[MEF1->currentState].During();
+					MEF1.arrayStates[MEF1.currentState].During();
 				}
-				MEF1->currentState = pT[uiTrans]->nextState;
+				//connection with LCD_Arduino task
+				uxBitsFlagsLCDArduino = xEventGroupSetBits(xGroupFlagsLCDArduino, (MEF1.flagStateChange)&FLAG_STATUS_CHANGED);
+				//exit the loop
+				break;
 			}
 		}
 
@@ -427,21 +535,63 @@ static void FSM_task_handler (void *parameters){
 
 static void Motor_Control_task_handler (void *parameters){
 	//high priority if using real motor. if not real motor, based on SW timer
-	for(;;){
 
+	for(;;){
+		//Print
+		//printf("Motor\n");
+		//if state is off/emergency, speed target is 0. If on, it depends on the distance to the station
+		switch(MEF1.currentState) {
+		case OFF_STATE:
+			//Print
+			//printf(" OFF\n");
+			break;
+		case ON_STATE:
+			//Print
+			//printf(" ON\n");
+			break;
+		case EMERGENCY_STATE:
+			//Print
+			//printf(" EMER\n");
+			break;
+		default:
+			//Print
+			printf("Motor error\n");
+			break;
+		}
 	}
 }
 
 static void Read_Temperature_task_handler (void *parameters){
-	//high priority, periodic function
+	//periodic function. Block for 5000 ms. */
+	const TickType_t xReadTemp_Delay = 5000 / portTICK_PERIOD_MS;
+
 	for(;;){
+		//Print
+		printf("Temperature\n");
+		if( xQueueReceive( xQueue_Temperature, (void *)&uiBuffer_QueueTemperature, (TickType_t) 10 ) == pdPASS ) //Block for 10 ticks if a message is not immediately available
+		  {
+			 //uiBuffer_QueueTemperature now contains a copy of xQueue_Temperature
+			printf(":%d\n", uiBuffer_QueueTemperature);
+		  }
+		else{
+			printf("Empty queue\n");
+		}
+		//Block the task for a period of ticks
+		vTaskDelay(xReadTemp_Delay);
 
 	}
 }
 
 static void LCD_Arduino_task_handler (void *parameters){
+	//Task blocked until a flag of the event group is active
+	//I want to wait forever,leaving blocked state only when unblock condition happens.const TickType_t xTicksToWait_LCDArduino = 1/portTICK_PERIOD_MS; //1 ms
 
 	for(;;){
+		//Print
+		printf("LCD\n");
+		//wait for any flag active ( xWaitForAllBits=FALSE).Clear the active flags ( xClearOnExit=pdTRUE)
+		//uxBitsFlagsLCDArduino = xEventGroupWaitBits(xGroupFlagsLCDArduino, FLAG_SPEED_CHANGED|FLAG_STATION_CHANGED|FLAG_STATUS_CHANGED, pdTRUE, pdFALSE, xTicksToWait_LCDArduino);
+		uxBitsFlagsLCDArduino = xEventGroupWaitBits(xGroupFlagsLCDArduino, FLAG_SPEED_CHANGED|FLAG_STATION_CHANGED|FLAG_STATUS_CHANGED, pdTRUE, pdFALSE, portMAX_DELAY);
 		//enable SPI
 
 		//send to Arduino: state + station + temperature
@@ -451,7 +601,8 @@ static void LCD_Arduino_task_handler (void *parameters){
 }
 
 //EXTI interrupt handler (OnOff button or emergency stop
-void HAL_GPIO_EXTI_Callback(GPIO_Pin){
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	//from OnOff button
 	if (GPIO_Pin == ButtonOnOff_Pin){
 		//set/reset flag
@@ -466,6 +617,12 @@ void HAL_GPIO_EXTI_Callback(GPIO_Pin){
 		//notify task FSM
 
 	}
+	// Notify the thread so it will wake up when the ISR is complete
+	vTaskNotifyGiveFromISR(FSM_taskPointer, &xHigherPriorityTaskWoken);
+	/*Force a context switch if xHigherPriorityTaskWoken is now set to pdTRUE. If vTaskNotifyGiveFromISR indicates that a higher priority task is being woken,
+	 *portYIELD_FROM_ISR() routine will context switch to that task after returning from the ISR.Failure to use this function will result
+	 *in execution resuming at previous point rather than switching to new context*/
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /* USER CODE END 4 */
