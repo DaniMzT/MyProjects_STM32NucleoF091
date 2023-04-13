@@ -64,6 +64,18 @@ typedef struct {
 #define NUMBER_TRANSITIONS_ON 3
 #define NUMBER_TRANSITIONS_EMERGENCY 3
 
+/*Temperature, I2C (ADS1115)*/
+#define LENGTH_QUEUE_TEMP 2
+#define ADS1115_ADDRESS (0x48) //0x48 is address of ADS1115 when ADDR connected to GND
+#define ADS1115_CONVERSION_REGISTER_BYTES 2
+#define ADS1115_GAIN 4076 //Gain amplifier in mV, check ADS1115 datasheet
+#define ADS1115_MAX 32768 //15 bytes
+
+//Group of event flags (bits) for the LCD_Arduino task
+#define FLAG_STATUS_CHANGED (1<<0)
+#define FLAG_STATION_CHANGED (1<<1)
+#define FLAG_SPEED_CHANGED (1<<2)
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,11 +84,27 @@ typedef struct {
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 uint8_t uiFlagOnOff = FALSE; //handled by ButtonOnOff_Pin interrupt handler. button with spring return, not switch
 uint8_t uiFlagEmergency = FALSE;//handled by EmergencyStopButton_Pin interrupt handler. button with spring return, not switch
+
+//Group of event flags (bits) for the LCD_Arduino task
+EventGroupHandle_t xGroupFlagsLCDArduino;
+EventBits_t uxBitsFlagsLCDArduino;
+
+//Temperature(I2C). Receive an item from a queue. The item is received by copy so a buffer of adequate size must be provided.
+QueueHandle_t xQueue_Temperature = NULL;
+volatile uint16_t uiBuffer_QueueTemperature;
+uint8_t uiBytes_to_ADS1115_reg[3] = {0x00,0x00,0x00}; //for ADS1115 configuration (it can require 3 bytes)
+uint8_t uiBytes_from_ADS1115[2] = {0x00,0x00}; //data received from ADS1115 (conversion register)
+volatile uint16_t uiLastADS1115_raw = 0;
+volatile uint16_t uiLastADS1115_mV = 0;
+uint16_t uiADS1115_address = ADS1115_ADDRESS<<1; //STM32 HAL for I2C transmit/receive requires left shift
+volatile uint8_t uiStep = 0; //needed for transmission/reception if we use IT functions,because they return OK after every byte sent and calls seem to be overwritten
 
 /* USER CODE END PV */
 
@@ -84,6 +112,7 @@ uint8_t uiFlagEmergency = FALSE;//handled by EmergencyStopButton_Pin interrupt h
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 /** FSM functions **/
 // Related to states: onEntry, during, onExit
@@ -131,17 +160,6 @@ PUTCHAR_PROTOTYPE
   HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
   return ch;
 }
-
-//Group of event flags (bits) for the LCD_Arduino task
-#define FLAG_STATUS_CHANGED (1<<0)
-#define FLAG_STATION_CHANGED (1<<1)
-#define FLAG_SPEED_CHANGED (1<<2)
-EventGroupHandle_t xGroupFlagsLCDArduino;
-EventBits_t uxBitsFlagsLCDArduino;
-
-//Temperature queue. Receive an item from a queue. The item is received by copy so a buffer of adequate size must be provided.
-QueueHandle_t xQueue_Temperature = NULL;
-uint16_t uiBuffer_QueueTemperature;
 
 /* USER CODE END PFP */
 
@@ -209,7 +227,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  //although I could turn on the blue LED (OFF state) in MX_GPIO_Init,I prefer to do call the OFF entry
+  onEntry_Off();
   //I decide to set priorities higher than tskIDLE_PRIORITY.
   //FSM control highest prio as I want that OnOff/Emergency interrupts wakes the task
   task_Status = xTaskCreate(FSM_task_handler, "FSMcontrol", 200, NULL, tskIDLE_PRIORITY+2, &FSM_taskPointer);
@@ -219,7 +240,7 @@ int main(void)
   configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
 
   //Create queue for reading temperature. if the queue is not created, do not create the task
-  xQueue_Temperature = xQueueCreate(5, sizeof(uint16_t));
+  xQueue_Temperature = xQueueCreate(LENGTH_QUEUE_TEMP, sizeof(uint16_t));
   if (xQueue_Temperature != NULL){
 	  task_Status = xTaskCreate(Read_Temperature_task_handler, "ReadTemperature", 200, NULL, tskIDLE_PRIORITY+1, &Read_Temperature_taskPointer);
 	  configASSERT(task_Status == pdPASS); //if false, then infinite loop. good for debugging
@@ -261,8 +282,10 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSI48;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -281,12 +304,61 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x2000090E;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
@@ -375,14 +447,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = ButtonOnOff_Pin|EmergencyStopButton_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PB6 PB9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
@@ -568,17 +632,49 @@ static void Read_Temperature_task_handler (void *parameters){
 	for(;;){
 		//Print
 		printf("Temperature\n");
-		if( xQueueReceive( xQueue_Temperature, (void *)&uiBuffer_QueueTemperature, (TickType_t) 10 ) == pdPASS ) //Block for 10 ticks if a message is not immediately available
-		  {
-			 //uiBuffer_QueueTemperature now contains a copy of xQueue_Temperature
-			printf(":%d\n", uiBuffer_QueueTemperature);
-		  }
-		else{
-			printf("Empty queue\n");
+		//Configure I2C communication
+		/*HAL_I2C_Master_Sequential_Transmit_IT:The device 7 bits address value in datasheet must be shifted to the left before calling the interface.
+		*Returns almost immediately and lets the main program continue, while the I2C transfer is in progress.
+		*That's why I'm using uiStep, in order not to overwrite calls */
+		switch(uiStep){
+		case 0:
+			//0.1.Write to config reg (0x01 points to it)
+			uiBytes_to_ADS1115_reg[0] = 0x01;
+			//0.2.+-4.076V,128 sps,b14-12 110:INp=AIN0 AInn=GND (single ended meas A0).b15:begin single conversion.b8: 1-single shot
+			uiBytes_to_ADS1115_reg[1] = 0xC3; //0b11000011 (MSB)
+			uiBytes_to_ADS1115_reg[2] = 0x83; //0b10000011 (LSB)
+			if (HAL_I2C_Master_Transmit_IT(&hi2c1, uiADS1115_address, uiBytes_to_ADS1115_reg, 3) != HAL_OK){
+				printf("err1\n");
+			}
+			break;
+		case 1://1.Select the conversion register by writing to pointer reg:address+0x00(points to conversion register)
+			uiBytes_to_ADS1115_reg[0] = 0x00; //0x00(points to conversion register)
+			if (HAL_I2C_Master_Transmit_IT(&hi2c1, uiADS1115_address, uiBytes_to_ADS1115_reg, 1) != HAL_OK){
+				printf("err2\n");
+			}
+			break;
+		case 2: //2.Reception
+			if (HAL_I2C_Master_Receive_IT(&hi2c1, uiADS1115_address, uiBytes_from_ADS1115, ADS1115_CONVERSION_REGISTER_BYTES) != HAL_OK){
+				printf("err3\n");
+			}
+			//Wait for reception from queue.Block for 10 ticks if a message is not immediately available.later on,restart transmission
+			if(xQueueReceive( xQueue_Temperature, (void *)&uiBuffer_QueueTemperature, (TickType_t) 10 ) == pdPASS )
+			{
+				//uiBuffer_QueueTemperature now contains a copy of xQueue_Temperature
+				printf(":%d\n", uiBuffer_QueueTemperature);
+			}
+			else{
+				printf("EmptyQ\n");
+			}
+			break;
+		default://error
+			printf("NoCase\n");
+			uiStep = 0;//start transmission -> uiStep=0
+			break;
 		}
+
 		//Block the task for a period of ticks
 		vTaskDelay(xReadTemp_Delay);
-
 	}
 }
 
@@ -600,7 +696,7 @@ static void LCD_Arduino_task_handler (void *parameters){
 	}
 }
 
-//EXTI interrupt handler (OnOff button or emergency stop
+//EXTI interrupt handler (OnOff button or emergency stop). __weak void overwritten
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	//from OnOff button
@@ -625,6 +721,31 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+//I2C reception handler callback. __weak void overwritten
+void HAL_I2C_MasterRxCpltCallback (I2C_HandleTypeDef *hi2c){
+	if (hi2c->Instance == hi2c1.Instance){ //I2C1
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		uiLastADS1115_raw = (uiBytes_from_ADS1115[0] << 8)|(uiBytes_from_ADS1115[1]); //byteRead is LSB and firstByteRead is MSB
+		uiLastADS1115_mV = uiLastADS1115_raw * ADS1115_GAIN/ADS1115_MAX;
+		xQueueSendFromISR(xQueue_Temperature, (void *)&uiLastADS1115_mV, &xHigherPriorityTaskWoken);
+		//switch context if necessary. */
+		if( xHigherPriorityTaskWoken )
+		{
+			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+		}
+		uiStep++;
+		uiStep%=3;
+	}
+
+}
+
+//I2C transmission handler callback. __weak void overwritten
+void HAL_I2C_MasterTxCpltCallback (I2C_HandleTypeDef *hi2c){
+	if (hi2c->Instance == hi2c1.Instance){ //I2C1
+		uiStep++;
+		uiStep%=3;
+	}
+}
 /* USER CODE END 4 */
 
 /**
